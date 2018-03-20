@@ -25,20 +25,18 @@ import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import com.github.mishaninss.uidriver.webdriver.chrome.ChromeExtender;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ * Implementation of {@link IPageDriver} interface based on WebDriver engine
+ * Provides methods to interact with a page in browser.
  * @author Sergey Mishanin
- *
  */
 @Component
 public class WdPageDriver implements IPageDriver {
@@ -158,65 +156,15 @@ public class WdPageDriver implements IPageDriver {
     @Override
     public byte[] takeScreenshot(){
         try {
-            return ChromeExtender.takeScreenshot();
+            if (properties.driver().browserName.equalsIgnoreCase("chrome")) {
+                return ChromeExtender.takeScreenshot();
+            } else {
+                return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(OutputType.BYTES);
+            }
         } catch (Exception e) {
             reporter.ignoredException(e);
             return new byte[0];
         }
-    }
-
-    @Override
-    public void deleteAllCookies() {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.manage().deleteAllCookies();
-    }
-
-    @Override
-    public void deleteCookieNamed(String cookieName) {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.manage().deleteCookieNamed(cookieName);
-    }
-
-    @Override
-    public Set<Cookie> getAllCookies() {
-        WebDriver driver = webDriverFactory.getDriver();
-        return driver.manage().getCookies();
-    }
-
-    @Override
-    public void addCookie(Cookie cookie) {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.manage().addCookie(cookie);
-    }
-
-    @Override
-    public Cookie getCookieNamed(String cookieName) {
-        WebDriver driver = webDriverFactory.getDriver();
-        return driver.manage().getCookieNamed(cookieName);
-    }
-
-    @Override
-    public Set<String> getWindowHandles() {
-        WebDriver driver = webDriverFactory.getDriver();
-        return driver.getWindowHandles();
-    }
-
-    @Override
-    public void switchToWindow(String windowHandle) {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.switchTo().window(windowHandle);
-    }
-
-    @Override
-    public void closeCurrentWindow() {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.close();
-    }
-
-    @Override
-    public void closeWindow(String windowHandle) {
-        WebDriver driver = webDriverFactory.getDriver();
-        driver.switchTo().window(windowHandle).close();
     }
 
     @Override
@@ -238,50 +186,34 @@ public class WdPageDriver implements IPageDriver {
     }
 
     @Override
-    public LogEntries getLogEntries(String logType){
-        return webDriverFactory.getDriver().manage().logs().get(logType);
-    }
-
-    @Override
-    public boolean isBrowserStarted(){
-        return webDriverFactory.isBrowserStarted();
-    }
-
-    @Override
     public String getPageSource() {
         return webDriverFactory.getDriver().getPageSource();
     }
 
     @Override
-    public void switchToFrame(String nameOrId) {
+    public WdPageDriver switchToFrame(String nameOrId) {
         WebDriver driver = webDriverFactory.getDriver();
         driver.switchTo().frame(nameOrId);
+        return this;
     }
 
     @Override
-    public void switchToFrame(ILocatable frameElement) {
+    public WdPageDriver switchToFrame(ILocatable frameElement) {
         WebDriver driver = webDriverFactory.getDriver();
         WebElement webElement = elementDriver.findElement(frameElement);
         driver.switchTo().frame(webElement);
+        return this;
     }
 
     @Override
-    public void switchToDefaultContent() {
+    public WdPageDriver switchToDefaultContent() {
         webDriverFactory.getDriver().switchTo().defaultContent();
+        return this;
     }
 
     @Override
-    public void maximizeWindow() {
-        WebDriver driver = webDriverFactory.getDriver();
-        if (StringUtils.isNoneBlank(properties.driver().screenResolution)){
-            driver.manage().window().setSize(webDriverFactory.getWindowDimension());
-        } else {
-            driver.manage().window().maximize();
-        }
-    }
-
-    @Override
-    public void scrollToTop() {
+    public WdPageDriver scrollToTop() {
         executeJS("window.scrollTo(0,0);");
+        return this;
     }
 }

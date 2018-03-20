@@ -29,6 +29,7 @@ final class LocatorType
     static final String TAG = "tag";
     static final String DOM = "dom";
     static final String CSS = "css";
+    static final String CLASS = "class";
 
     /** Hidden constructor */
     private LocatorType() {}

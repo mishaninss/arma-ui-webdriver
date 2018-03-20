@@ -16,6 +16,8 @@
 
 package com.github.mishaninss.data;
 
+import com.github.mishaninss.data.UiCommonsProperties.Application;
+import com.github.mishaninss.data.UiCommonsProperties.Framework;
 import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,58 +33,74 @@ import org.springframework.stereotype.Component;
 public class WebDriverProperties {
 
     @Autowired
+    @Qualifier("webDriverDriverProps")
     private Driver driverProps;
     @Autowired
     @Qualifier("uiCommonsApplicationProps")
-    private UiCommonsProperties.Application applicationProps;
+    private Application applicationProps;
     @Autowired
     @Qualifier("uiCommonsFrameworkProps")
-    private UiCommonsProperties.Framework frameworkProps;
+    private Framework frameworkProps;
 
     public Driver driver() {
         return driverProps;
     }
 
-    public UiCommonsProperties.Application application() {
+    public Application application() {
         return applicationProps;
     }
 
-    public UiCommonsProperties.Framework framework() {
+    public Framework framework() {
         return frameworkProps;
     }
 
     /**
      * Contains a list of available environment property names
      */
-    @Component
+    @Component("webDriverDriverProps")
     public static class Driver extends UiCommonsProperties.Driver{
-        public static final String COLLECT_NETWORK_LOGS = "taf.driver.collect.network.logs";
-        public static final String COLLECT_TRACING_LOGS = "taf.driver.collect.tracing.logs";
-        public static final String GRID_URL = "taf.driver.grid.url";
-        public static final String DEVICE_NAME = "taf.driver.device.name";
-        public static final String PLATFORM_NAME = "taf.driver.platform.name";
-        public static final String PLATFORM_VERSION = "taf.driver.platform.version";
-        public static final String BROWSER_NAME = "taf.driver.browser.name";
-        public static final String BROWSER_VERSION = "taf.driver.browser.version";
-        public static final String SCREEN_RESOLUTION = "taf.driver.screen.resolution";
-        public static final String NETWORK_CONDITIONS = "taf.driver.network.conditions";
-        public static final String UNEXPECTED_ALERT_BEHAVIOUR = "taf.driver.unexpected.alert.behaviour";
+        public static final String COLLECT_NETWORK_LOGS = "arma.driver.collect.network.logs";
+        public static final String COLLECT_TRACING_LOGS = "arma.driver.collect.tracing.logs";
+        public static final String GRID_URL = "arma.driver.grid.url";
+        public static final String DEVICE_NAME = "arma.driver.device.name";
+        public static final String PLATFORM_NAME = "arma.driver.platform.name";
+        public static final String PLATFORM_VERSION = "arma.driver.platform.version";
+        public static final String BROWSER_NAME = "arma.driver.browser.name";
+        public static final String BROWSER_VERSION = "arma.driver.browser.version";
+        public static final String SCREEN_RESOLUTION = "arma.driver.screen.resolution";
+        public static final String NETWORK_CONDITIONS = "arma.driver.network.conditions";
+        public static final String UNEXPECTED_ALERT_BEHAVIOUR = "arma.driver.unexpected.alert.behaviour";
 
         @Value("${" + COLLECT_NETWORK_LOGS + ":false}")
         public boolean collectNetworkLogs;
+
         @Value("${" + COLLECT_TRACING_LOGS + ":false}")
         public boolean collectTracingLogs;
+
         @Value("${" + GRID_URL + ":}")
         public String gridUrl;
-        public String deviceName = "taf.driver.device.name";
-        public String platformName = "taf.driver.platform.name";
-        public String platformVersion = "taf.driver.platform.version";
+
+        @Value("${" + DEVICE_NAME + ":}")
+        public String deviceName;
+
+        @Value("${" + PLATFORM_NAME + ":}")
+        public String platformName;
+
+        @Value("${" + PLATFORM_VERSION + ":}")
+        public String platformVersion;
+
         @Value("${" + BROWSER_NAME + ":chrome}")
         public String browserName;
-        public String browserVersion = "taf.driver.browser.version";
-        public String screenResolution = "taf.driver.screen.resolution";
+
+        @Value("${" + BROWSER_VERSION + ":}")
+        public String browserVersion;
+
+        @Value("${" + SCREEN_RESOLUTION + ":}")
+        public String screenResolution;
+
         @Value("${" + NETWORK_CONDITIONS + ":}")
         public String networkConditions;
+
         @Value("${" + UNEXPECTED_ALERT_BEHAVIOUR + ":}")
         public String unexpectedAlertBehaviour;
 

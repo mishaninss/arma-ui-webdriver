@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,11 +32,11 @@ public final class LocatorConverter {
     /**
      * Parsing engine
      */
-    private static final Pattern pattern;
+    private static final Pattern PATTERN;
     /**
      * Locator converters. Pairs "locator type - converter"
      */
-    private static final Map<String, ByFor> converters;
+    private static final Map<String, ByFor> CONVERTERS;
     /**
      * Templates for error messages
      */
@@ -94,7 +94,7 @@ public final class LocatorConverter {
         }
 
         String locatorType = null;
-        Matcher matcher = pattern.matcher(locatorValue);
+        Matcher matcher = PATTERN.matcher(locatorValue);
         if(matcher.matches()) {
             int index = 0;
             locatorType = matcher.group(++index);
@@ -107,7 +107,7 @@ public final class LocatorConverter {
             }
         }
 
-        ByFor locatorConverter = converters.get(locatorType);
+        ByFor locatorConverter = CONVERTERS.get(locatorType);
         if(locatorConverter == null) {
             String errorMessage = String.format(UNKNOWN_TYPE, locator);
             throw new IllegalArgumentException(errorMessage);
@@ -220,6 +220,20 @@ public final class LocatorConverter {
         }
     }
 
+    /** Converter for type "class" */
+    private static class ByForClassName implements ByFor
+    {
+        /**
+         * Converts locator value to "location technique" for WebDriver API
+         * @param locatorValue - locator value without explicit type
+         */
+        @Override
+        public By toBy(final String locatorValue)
+        {
+            return By.className(locatorValue);
+        }
+    }
+
     /** Converter for type "css" */
     private static class ByForCSS implements ByFor
     {
@@ -236,14 +250,15 @@ public final class LocatorConverter {
 
     static
     {
-        pattern = Pattern.compile("(?:([a-zA-Z]+)\\s*=\\s*)?(.+)");
+        PATTERN = Pattern.compile("(?:([a-zA-Z]+)\\s*=\\s*)?(.+)");
 
-        converters = new Hashtable<>();
-        converters.put(LocatorType.ID, new ByForId());
-        converters.put(LocatorType.NAME, new ByForName());
-        converters.put(LocatorType.XPATH, new ByForXPath());
-        converters.put(LocatorType.CSS, new ByForCSS());
-        converters.put(LocatorType.LINK, new ByForLinkText());
-        converters.put(LocatorType.TAG, new ByForTagName());
+        CONVERTERS = new HashMap<>();
+        CONVERTERS.put(LocatorType.ID, new ByForId());
+        CONVERTERS.put(LocatorType.NAME, new ByForName());
+        CONVERTERS.put(LocatorType.XPATH, new ByForXPath());
+        CONVERTERS.put(LocatorType.CSS, new ByForCSS());
+        CONVERTERS.put(LocatorType.LINK, new ByForLinkText());
+        CONVERTERS.put(LocatorType.TAG, new ByForTagName());
+        CONVERTERS.put(LocatorType.CLASS, new ByForTagName());
     }
 }
