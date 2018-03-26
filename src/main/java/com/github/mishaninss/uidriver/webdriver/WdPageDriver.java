@@ -18,11 +18,7 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
-import com.github.mishaninss.uidriver.interfaces.IElementDriver;
-import com.github.mishaninss.uidriver.interfaces.ILocatable;
-import com.github.mishaninss.uidriver.interfaces.IPageDriver;
-import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
-import com.github.mishaninss.uidriver.webdriver.chrome.ChromeExtender;
+import com.github.mishaninss.uidriver.interfaces.*;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -50,6 +46,8 @@ public class WdPageDriver implements IPageDriver {
     private IElementDriver elementDriver;
     @Autowired
     private IWaitingDriver waitingDriver;
+    @Autowired
+    private IScreenshoter screenshoter;
 
     @Override
     public WdPageDriver goToUrl(String url){
@@ -155,16 +153,7 @@ public class WdPageDriver implements IPageDriver {
 
     @Override
     public byte[] takeScreenshot(){
-        try {
-            if (properties.driver().browserName.equalsIgnoreCase("chrome")) {
-                return ChromeExtender.takeScreenshot();
-            } else {
-                return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(OutputType.BYTES);
-            }
-        } catch (Exception e) {
-            reporter.ignoredException(e);
-            return new byte[0];
-        }
+        return screenshoter.takeScreenshot();
     }
 
     @Override

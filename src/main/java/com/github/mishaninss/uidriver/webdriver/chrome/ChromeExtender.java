@@ -16,11 +16,14 @@
 
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
-import com.github.mishaninss.uidriver.webdriver.WebDriverFactory;
+import com.github.mishaninss.uidriver.webdriver.IWebDriverFactory;
 import com.google.common.collect.ImmutableMap;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,11 +32,14 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
+@Profile("chrome")
 public class ChromeExtender {
 
-    private ChromeExtender(){}
+    @Autowired
+    private IWebDriverFactory webDriverFactory;
 
-    public static byte[] takeScreenshot() throws IOException {
+    public byte[] takeScreenshot() throws IOException {
         Object visibleSize = evaluate("({x:0,y:0,width:window.innerWidth,height:window.innerHeight})");
         Long visibleW = jsonValue(visibleSize, "result.value.width", Long.class);
         Long visibleH = jsonValue(visibleSize, "result.value.height", Long.class);
@@ -60,7 +66,7 @@ public class ChromeExtender {
     }
 
     @Nonnull
-    private static Object evaluate(@Nonnull String script) throws IOException {
+    private Object evaluate(@Nonnull String script) throws IOException {
         Map<String, Object> param = new HashMap<>();
         param.put("returnByValue", Boolean.TRUE);
         param.put("expression", script);
@@ -69,8 +75,8 @@ public class ChromeExtender {
     }
 
     @Nonnull
-    private static Object send(@Nonnull String cmd, @Nonnull Map<String, Object> params) throws IOException {
-        ExtendedChromeDriver driver = (ExtendedChromeDriver) WebDriverFactory.get().getDriver();
+    private Object send(@Nonnull String cmd, @Nonnull Map<String, Object> params) throws IOException {
+        ExtendedChromeDriver driver = (ExtendedChromeDriver) webDriverFactory.getDriver();
         Map<String, Object> exe = ImmutableMap.of("cmd", cmd, "params", params);
         Command xc = new Command(driver.getSessionId(), "sendCommandWithResult", exe);
         Response response = driver.getCommandExecutor().execute(xc);

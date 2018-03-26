@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.mishaninss.uidriver.webdriver.capabilities;
+package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.data.WebDriverProperties;
-import com.github.mishaninss.uidriver.webdriver.webdrivercreators.MultiBrowserCreator;
+import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
@@ -27,6 +27,7 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-@Component(MultiBrowserCreator.CHROME_CAPABILITIES_PROVIDER)
+@Component
+@Profile("chrome")
 public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvider {
 
     @Autowired

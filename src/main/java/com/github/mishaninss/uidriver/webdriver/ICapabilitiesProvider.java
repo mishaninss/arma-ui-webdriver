@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.mishaninss.uidriver.webdriver.capabilities;
+package com.github.mishaninss.uidriver.webdriver;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 
