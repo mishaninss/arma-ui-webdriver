@@ -17,6 +17,7 @@
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.uidriver.interfaces.IScreenshoter;
+import org.openqa.selenium.OutputType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,23 @@ public class ChromeScreenshoter implements IScreenshoter {
             return chromeExtender.takeScreenshot();
         } catch (IOException e) {
             return new byte[0];
+        }
+    }
+
+    @Override
+    public <X> X takeScreenshotAs(OutputType<X> outputType) {
+        try {
+            if (OutputType.BASE64.equals(outputType)) {
+                return (X) chromeExtender.takeScreenshotAsString();
+            } else if (OutputType.BYTES.equals(outputType)) {
+                return (X) chromeExtender.takeScreenshot();
+            } else if (OutputType.FILE.equals(outputType)) {
+                return (X) chromeExtender.takeScreenshotAsFile();
+            } else {
+                return null;
+            }
+        } catch (IOException ex){
+            return null;
         }
     }
 }

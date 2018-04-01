@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package com.github.mishaninss.uidriver.webdriver;
+package com.github.mishaninss.uidriver.webdriver.chrome;
 
-import com.github.mishaninss.uidriver.interfaces.IScreenshoter;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+import com.github.mishaninss.uidriver.webdriver.WebDriverFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Provides a single instance of WebDriver
+ * @author Sergey Mishanin
+ *
+ */
 @Component
-@Profile("!chrome")
-public class WdDefaultScreenshoter implements IScreenshoter {
+@Profile("chrome")
+public class ChromeDriverFactory extends WebDriverFactory {
 
     @Autowired
-    private IWebDriverFactory webDriverFactory;
+    private IChromeDriverServiceCreator chromeDriverServiceCreator;
 
+    /**
+     * nulls WebDriver instance
+     */
     @Override
-    public byte[] takeScreenshot() {
-        return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(OutputType.BYTES);
-    }
-
-    @Override
-    public <X> X takeScreenshotAs(OutputType<X> outputType) {
-        return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(outputType);
+    public void hardCloseDriver(){
+        super.hardCloseDriver();
+        chromeDriverServiceCreator.terminateChrome();
     }
 }

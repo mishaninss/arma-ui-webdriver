@@ -16,8 +16,10 @@
 
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
+import com.github.mishaninss.data.UiCommonsProperties;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverFactory;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.Response;
@@ -27,8 +29,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,8 +42,19 @@ public class ChromeExtender {
 
     @Autowired
     private IWebDriverFactory webDriverFactory;
+    @Autowired
+    private UiCommonsProperties properties;
 
     public byte[] takeScreenshot() throws IOException {
+        String image = takeScreenshotAsString();
+        if (image == null){
+            return new byte[0];
+        } else {
+            return Base64.getDecoder().decode(image);
+        }
+    }
+
+    public String takeScreenshotAsString() throws IOException {
         Object visibleSize = evaluate("({x:0,y:0,width:window.innerWidth,height:window.innerHeight})");
         Long visibleW = jsonValue(visibleSize, "result.value.width", Long.class);
         Long visibleH = jsonValue(visibleSize, "result.value.height", Long.class);
@@ -57,12 +72,19 @@ public class ChromeExtender {
 
         send("Emulation.setVisibleSize", ImmutableMap.of("x", Long.valueOf(0), "y", Long.valueOf(0), "width", visibleW, "height", visibleH));
 
-        String image = jsonValue(value, "data", String.class);
-        if (image == null){
-            return new byte[0];
-        } else {
-            return Base64.getDecoder().decode(image);
+        return jsonValue(value, "data", String.class);
+    }
+
+    public File takeScreenshotAsFile() throws IOException {
+        String screenshotsDir = properties.framework().screenshotsDir;
+        File dir = new File(screenshotsDir);
+        if (!dir.exists()){
+            FileUtils.forceMkdir(dir);
         }
+        String fileName = "Screenshot_" + new Date().getTime();
+        File screenshotFile = new File(dir, fileName);
+        FileUtils.writeByteArrayToFile(screenshotFile, takeScreenshot());
+        return screenshotFile;
     }
 
     @Nonnull

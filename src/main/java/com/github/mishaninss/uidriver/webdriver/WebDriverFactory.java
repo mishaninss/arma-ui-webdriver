@@ -25,6 +25,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -37,12 +38,13 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Component
+@Profile("!chrome")
 public class WebDriverFactory implements IWebDriverFactory {
 
     @Autowired
-    private IReporter reporter;
+    protected IReporter reporter;
     @Autowired
-    private WebDriverProperties properties;
+    protected WebDriverProperties properties;
     @Autowired
     private IWebDriverCreator webDriverCreator;
 
@@ -50,7 +52,7 @@ public class WebDriverFactory implements IWebDriverFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebDriverFactory.class);
     private static final ThreadLocal<IWebDriverFactory> INSTANCES = new ThreadLocal<>();
-    private DesiredCapabilities desiredCapabilities;
+    protected DesiredCapabilities desiredCapabilities;
 
     @PostConstruct
     private void init(){
@@ -58,7 +60,7 @@ public class WebDriverFactory implements IWebDriverFactory {
     }
 
     @PreDestroy
-    private void destroy(){
+    protected void destroy(){
         closeDriver();
         INSTANCES.remove();
     }

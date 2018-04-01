@@ -18,11 +18,11 @@ package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.exceptions.FrameworkConfigurationException;
-import com.github.mishaninss.uidriver.webdriver.IWebDriverCreator;
-import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
+import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -33,13 +33,15 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Profile("chrome")
-public class ChromeBrowserCreator implements IWebDriverCreator {
+public class ChromeBrowserCreator implements IChromeDriverCreator {
     private static final String COULD_NOT_START_SESSION_MESSAGE = "Could not start a new browser session";
 
     @Autowired
     private WebDriverProperties properties;
     @Autowired
     private ICapabilitiesProvider capabilitiesProvider;
+    @Autowired
+    private IChromeDriverServiceCreator chromeDriverServiceCreator;
 
     @Override
     public WebDriver createDriver(DesiredCapabilities desiredCapabilities) {
@@ -52,7 +54,11 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
                 webDriver = new ExtendedChromeDriver(new URL(gridUrl), capabilities);
             } else {
                 ChromeDriverManager.getInstance().setup();
-                webDriver = new ExtendedChromeDriver(capabilities);
+                ChromeDriverService chromeDriverService = chromeDriverServiceCreator.getChromeDriverService();
+                if (!chromeDriverService.isRunning()){
+                    chromeDriverService.start();
+                }
+                webDriver = new ExtendedChromeDriver(chromeDriverService, capabilities);
             }
             NetworkConditions networkConditions = properties.driver().getNetworkConditions();
             if (networkConditions != null) {
