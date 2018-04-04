@@ -16,6 +16,7 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
+import com.github.mishaninss.uidriver.LocatorType;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -128,14 +129,10 @@ public final class LocatorConverter {
      */
     private static String detectImplicitType(final String locatorValue)
     {
-        String implicitType = LocatorType.IDENTIFIER; 
+        String implicitType = "";
         if(locatorValue.startsWith("./") ||locatorValue.startsWith("//") || locatorValue.startsWith("(//") || locatorValue.startsWith("(./"))
         {
             implicitType = LocatorType.XPATH;
-        }
-        else if(locatorValue.startsWith("document."))
-        {
-            implicitType = LocatorType.DOM;
         }
         return implicitType;
     }
@@ -206,6 +203,20 @@ public final class LocatorConverter {
         }
     }
 
+    /** Converter for type "partialLink" */
+    private static class ByForPartialLinkText implements ByFor
+    {
+        /**
+         * Converts locator value to "location technique" for WebDriver API
+         * @param locatorValue - locator value without explicit type
+         */
+        @Override
+        public By toBy(final String locatorValue)
+        {
+            return By.partialLinkText(locatorValue);
+        }
+    }
+
     /** Converter for type "link" */
     private static class ByForTagName implements ByFor
     {
@@ -258,6 +269,7 @@ public final class LocatorConverter {
         CONVERTERS.put(LocatorType.XPATH, new ByForXPath());
         CONVERTERS.put(LocatorType.CSS, new ByForCSS());
         CONVERTERS.put(LocatorType.LINK, new ByForLinkText());
+        CONVERTERS.put(LocatorType.PARTIAL_LINK, new ByForPartialLinkText());
         CONVERTERS.put(LocatorType.TAG, new ByForTagName());
         CONVERTERS.put(LocatorType.CLASS, new ByForTagName());
     }
