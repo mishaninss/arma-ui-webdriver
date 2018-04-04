@@ -17,6 +17,9 @@
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.data.WebDriverProperties;
+import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.webdriver.DesiredCapabilitiesLoader;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Platform;
@@ -27,6 +30,7 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +43,18 @@ import java.util.logging.Level;
 @Component
 @Profile("chrome")
 public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvider {
+    public static final String CAPABILITIES_PROPERTY_PREFIX = "arma.driver.chrome.capability.";
+    public static final String CAPABILITIES_FILE_PROPERTY = "arma.driver.chrome.capabilities.file";
+    private static final String DEFAULT_CHROME_CAPABILITIES_FILE = "./chrome_capabilities.properties";
+    @Value("${" + CAPABILITIES_FILE_PROPERTY + ":" + DEFAULT_CHROME_CAPABILITIES_FILE + "}")
+    public String capabilitiesFile;
 
     @Autowired
     private WebDriverProperties properties;
+    @Autowired
+    private DesiredCapabilitiesLoader capabilitiesLoader;
+    @Reporter
+    private IReporter reporter;
 
     private Map<String, Object> getChromeOptions(){
         Map<String, Object> chromeOptions = new HashMap<>();
@@ -114,11 +127,17 @@ public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvi
 
     @Override
     public DesiredCapabilities getCapabilities() {
+        DesiredCapabilities capabilities;
         if (properties.driver().isRemote()){
-            return getGridCapabilities();
+            capabilities = getGridCapabilities();
+        } else {
+            capabilities = getChromeCapabilities();
         }
-        else {
-            return getChromeCapabilities();
-        }
+
+        capabilities.merge(capabilitiesLoader.loadCapabilities(capabilitiesFile));
+        capabilities.merge(capabilitiesLoader.loadEnvironmentProperties());
+        capabilities.merge(capabilitiesLoader.loadEnvironmentProperties(CAPABILITIES_PROPERTY_PREFIX));
+        reporter.debug("Desired capabilities: " + capabilities);
+        return capabilities;
     }
 }

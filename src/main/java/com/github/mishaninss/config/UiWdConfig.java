@@ -17,8 +17,11 @@
 package com.github.mishaninss.config;
 
 import com.github.mishaninss.aspects.SeleniumAspects;
+import com.github.mishaninss.uidriver.interfaces.*;
+import com.github.mishaninss.uidriver.webdriver.*;
 import org.aspectj.lang.Aspects;
 import org.springframework.beans.factory.annotation.Autowire;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -30,6 +33,36 @@ public class UiWdConfig {
     @Bean(autowire = Autowire.BY_TYPE)
     public SeleniumAspects seleniumAspects() {
         return Aspects.aspectOf(SeleniumAspects.class);
+    }
+
+    @Bean @Qualifier(IWaitingDriver.QUALIFIER)
+    public IWaitingDriver waitingDriver(){
+        return new WdWaitingDriver();
+    }
+
+    @Bean @Qualifier(IBrowserDriver.QUALIFIER)
+    public IBrowserDriver browserDriver(){
+        return new WdBrowserDriver();
+    }
+
+    @Bean @Qualifier(IElementDriver.QUALIFIER)
+    public IElementDriver elementDriver(){
+        return new WdElementDriver();
+    }
+
+    @Bean @Qualifier(IElementsDriver.QUALIFIER)
+    public IElementsDriver elementsDriver(){
+        return new WdElementsDriver();
+    }
+
+    @Bean @Qualifier(IPageDriver.QUALIFIER)
+    public IPageDriver pageDriver(){
+        return new WdPageDriver();
+    }
+
+    @Bean @Qualifier(ISelectElementDriver.QUALIFIER)
+    public ISelectElementDriver selectElementDriver(){
+        return new WdSelectElementDriver();
     }
 
 }

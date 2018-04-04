@@ -17,6 +17,7 @@
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
 import org.apache.commons.exec.OS;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Profile("chrome")
 public class ChromeDriverServiceCreatorImpl implements IChromeDriverServiceCreator {
 
-    @Autowired
+    @Reporter
     private IReporter reporter;
 
     private static final AtomicBoolean useCliCleanup = new AtomicBoolean(true);

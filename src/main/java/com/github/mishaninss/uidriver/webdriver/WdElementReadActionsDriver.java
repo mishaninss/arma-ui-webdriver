@@ -18,6 +18,7 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.html.listeners.ElementEvent;
 import com.github.mishaninss.html.listeners.FiresEvent;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementReadActionDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WdElementReadActionsDriver implements IElementReadActionDriver {
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
 
     private ILocatable element;

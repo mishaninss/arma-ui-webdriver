@@ -18,6 +18,9 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.*;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
@@ -36,15 +39,15 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class WdPageDriver implements IPageDriver {
-    @Autowired
+    @Reporter
     private IReporter reporter;
     @Autowired
     private WebDriverProperties properties;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
-    @Autowired
+    @WaitingDriver
     private IWaitingDriver waitingDriver;
     @Autowired
     private IScreenshoter screenshoter;

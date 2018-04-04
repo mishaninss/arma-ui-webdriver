@@ -24,6 +24,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  * Created by Sergey_Mishanin
  */
 public interface IWebDriverFactory {
+    String QUALIFIER = "IWebDriverFactory";
 
     /**
      * Provides an instance of WebDriver. Creates this instance if it has not

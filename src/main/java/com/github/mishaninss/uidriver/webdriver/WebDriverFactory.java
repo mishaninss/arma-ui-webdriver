@@ -18,6 +18,7 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -41,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 @Profile("!chrome")
 public class WebDriverFactory implements IWebDriverFactory {
 
-    @Autowired
+    @Reporter
     protected IReporter reporter;
     @Autowired
     protected WebDriverProperties properties;

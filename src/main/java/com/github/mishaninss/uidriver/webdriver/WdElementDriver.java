@@ -18,7 +18,9 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
 import com.github.mishaninss.uidriver.Arma;
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
@@ -44,13 +46,13 @@ import java.util.Map;
  */
 @Component
 public class WdElementDriver implements IElementDriver {
-    @Autowired
+    @Reporter
     private IReporter reporter;
     @Autowired
     private WebDriverProperties properties;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    @Autowired
+    @WaitingDriver
     private IWaitingDriver waitingDriver;
     @Autowired
     private Arma arma;

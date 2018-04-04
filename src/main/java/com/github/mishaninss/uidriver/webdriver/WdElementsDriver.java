@@ -18,6 +18,8 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementsDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
@@ -44,11 +46,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class WdElementsDriver implements IElementsDriver {
-    @Autowired
+    @Reporter
     private IReporter reporter;
     @Autowired
     private WebDriverProperties properties;
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
     @Autowired
     private IWebDriverFactory webDriverFactory;

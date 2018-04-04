@@ -17,6 +17,8 @@
 package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
+import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import org.openqa.selenium.JavascriptExecutor;
@@ -26,6 +28,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -36,9 +39,9 @@ import java.time.temporal.TemporalUnit;
 public class WdWaitingDriver implements IWaitingDriver {
 
     @Autowired
-    private IWebDriverFactory webDriverFactory;
-    @Autowired
-    private WdElementDriver elementDriver;
+    protected IWebDriverFactory webDriverFactory;
+    @ElementDriver
+    private IElementDriver elementDriver;
     @Autowired
     private WebDriverProperties properties;
 
@@ -137,7 +140,7 @@ public class WdWaitingDriver implements IWaitingDriver {
         performWait(IS_PAGE_UPDATED, timeout, unit);
     }
 
-    private void performWait(ExpectedCondition<?> condition, long timeout, TemporalUnit unit){
+    protected void performWait(ExpectedCondition<?> condition, long timeout, TemporalUnit unit){
         FluentWait<WebDriver> wait = new FluentWait<>(webDriverFactory.getDriver());
         Duration duration = Duration.of(timeout, unit);
         wait.withTimeout(duration).until(condition);

@@ -59,7 +59,6 @@ public class WebDriverProperties {
      */
     @Component("webDriverDriverProps")
     public static class Driver extends UiCommonsProperties.Driver{
-        public static final String COLLECT_NETWORK_LOGS = "arma.driver.collect.network.logs";
         public static final String COLLECT_TRACING_LOGS = "arma.driver.collect.tracing.logs";
         public static final String GRID_URL = "arma.driver.grid.url";
         public static final String DEVICE_NAME = "arma.driver.device.name";
@@ -71,6 +70,7 @@ public class WebDriverProperties {
         public static final String NETWORK_CONDITIONS = "arma.driver.network.conditions";
         public static final String UNEXPECTED_ALERT_BEHAVIOUR = "arma.driver.unexpected.alert.behaviour";
 
+        public static final String COLLECT_NETWORK_LOGS = "arma.driver.collect.network.logs";
         @Value("${" + COLLECT_NETWORK_LOGS + ":false}")
         public boolean collectNetworkLogs;
 

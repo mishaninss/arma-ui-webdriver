@@ -16,6 +16,7 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementWaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
@@ -32,7 +33,7 @@ public class WdElementWaitingDriver implements IElementWaitingDriver {
 
     private ILocatable element;
 
-    @Autowired
+    @WaitingDriver
     private IWaitingDriver waitingDriver;
 
     public WdElementWaitingDriver(ILocatable element){

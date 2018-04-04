@@ -18,6 +18,7 @@ package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.exceptions.FrameworkConfigurationException;
+import com.github.mishaninss.uidriver.webdriver.DesiredCapabilitiesLoader;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
@@ -25,6 +26,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +49,9 @@ public class ChromeBrowserCreator implements IChromeDriverCreator {
     public WebDriver createDriver(DesiredCapabilities desiredCapabilities) {
         WebDriver webDriver;
 
-        DesiredCapabilities capabilities = desiredCapabilities != null ? desiredCapabilities : capabilitiesProvider.getCapabilities();
+        DesiredCapabilities capabilities = capabilitiesProvider.getCapabilities();
+        capabilities.merge(desiredCapabilities);
+
         try {
             if (properties.driver().isRemote()) {
                 String gridUrl = properties.driver().gridUrl;

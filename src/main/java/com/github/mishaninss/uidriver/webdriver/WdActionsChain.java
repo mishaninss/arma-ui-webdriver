@@ -18,6 +18,9 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.html.interfaces.INamed;
 import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.IActionsChain;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
@@ -36,11 +39,11 @@ import java.util.Arrays;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WdActionsChain implements IActionsChain {
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
-    @Autowired
+    @WaitingDriver
     private IWaitingDriver waitingDriver;
-    @Autowired
+    @Reporter
     private IReporter reporter;
     @Autowired
     private IWebDriverFactory webDriverFactory;

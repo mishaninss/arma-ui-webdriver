@@ -18,6 +18,7 @@ package com.github.mishaninss.aspects;
 
 import com.github.mishaninss.data.UiCommonsProperties;
 import com.github.mishaninss.exceptions.SessionLostException;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverFactory;
 import com.github.mishaninss.utils.ConcurrentUtils;
@@ -52,7 +53,7 @@ public class SeleniumAspects {
     private UiCommonsProperties uiCommonsProperties;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
 
 	@Pointcut("call(* org.openqa.selenium..* (..))")

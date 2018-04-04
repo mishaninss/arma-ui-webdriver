@@ -16,6 +16,7 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.ISelectElementDriver;
@@ -34,7 +35,7 @@ import java.util.List;
  */
 @Component
 public class WdSelectElementDriver implements ISelectElementDriver {
-    @Autowired
+    @ElementDriver
     private IElementDriver elementDriver;
     @Autowired
     IWebDriverFactory webDriverFactory;
