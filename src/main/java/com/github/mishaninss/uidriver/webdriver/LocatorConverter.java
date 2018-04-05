@@ -271,6 +271,6 @@ public final class LocatorConverter {
         CONVERTERS.put(LocatorType.LINK, new ByForLinkText());
         CONVERTERS.put(LocatorType.PARTIAL_LINK, new ByForPartialLinkText());
         CONVERTERS.put(LocatorType.TAG, new ByForTagName());
-        CONVERTERS.put(LocatorType.CLASS, new ByForTagName());
+        CONVERTERS.put(LocatorType.CLASS, new ByForClassName());
     }
 }

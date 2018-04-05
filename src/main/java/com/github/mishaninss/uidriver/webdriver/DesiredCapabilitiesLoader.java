@@ -44,14 +44,14 @@ public class DesiredCapabilitiesLoader {
     public static final String CAPABILITIES_PROPERTY_PREFIX = "arma.driver.capability.";
     public static final String CAPABILITIES_FILE_PROPERTY = "arma.driver.capabilities.file";
     @Value("${" + CAPABILITIES_FILE_PROPERTY + ":/capabilities.properties}")
-    public String capabilitiesFile;
+    public String defaultCapabilitiesFile;
     @Reporter
     private IReporter reporter;
     @Autowired
     private Environment environment;
 
     public DesiredCapabilities loadCapabilities(){
-        return loadCapabilities(capabilitiesFile);
+        return loadCapabilities(defaultCapabilitiesFile);
     }
 
     public DesiredCapabilities loadCapabilities(String capabilitiesFilePath){
@@ -71,6 +71,7 @@ public class DesiredCapabilitiesLoader {
         switch (format){
             case "properties": capabilities.merge(loadPropertiesFile(capabilitiesFile)); break;
             case "json": capabilities.merge(loadJsonFile(capabilitiesFile)); break;
+            default: reporter.warn("Unknown desired capabilities file format [{}]. Supported formats: .properties, .json", format);
         }
         return capabilities;
     }
@@ -123,8 +124,7 @@ public class DesiredCapabilitiesLoader {
                 .flatMap(Arrays::<String>stream)
                 .forEach(propName -> {
                         if (propName.startsWith(prefix)){
-                            String capabilityName = StringUtils.substringAfter(propName, prefix);
-                            capabilities.setCapability(capabilityName, environment.getProperty(propName));
+                            capabilities.setCapability(StringUtils.substringAfter(propName, prefix), environment.getProperty(propName));
                         }
                     }
                 );

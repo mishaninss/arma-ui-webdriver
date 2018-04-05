@@ -334,17 +334,6 @@ public class WdElementDriver implements IElementDriver {
         }
     }
 
-    private void unhighlightElement(){
-        WebDriver webDriver = webDriverFactory.getDriver();
-        JavascriptExecutor js = (JavascriptExecutor) webDriver;
-        js.executeScript(
-                "var elements = document.getElementsByClassName('webDriverBorder');" +
-                "if (elements.length > 0){" +
-                    "elements[0].style.border='';" +
-                    "elements[0].classList.remove('webDriverBorder');" +
-                "}");
-    }
-
     private void unhighlightElement(WebElement webElement){
         WebDriver webDriver = webDriverFactory.getDriver();
         JavascriptExecutor js = (JavascriptExecutor) webDriver;

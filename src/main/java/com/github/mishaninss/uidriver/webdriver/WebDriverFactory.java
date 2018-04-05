@@ -78,7 +78,7 @@ public class WebDriverFactory implements IWebDriverFactory {
     @Override
     public synchronized WebDriver getDriver(){
         if (!isBrowserStarted()){
-            LOGGER.info("Starting driver session", LOGGER);
+            LOGGER.info("Starting driver session");
             driver = webDriverCreator.createDriver(desiredCapabilities);
         }
         return driver;
@@ -90,7 +90,7 @@ public class WebDriverFactory implements IWebDriverFactory {
     @Override
     public void closeDriver(){
         if (isBrowserStarted()){
-            LOGGER.info("Quit driver", LOGGER);
+            LOGGER.info("Quit driver");
             try {
                 driver.close();
                 driver.quit();
@@ -109,7 +109,7 @@ public class WebDriverFactory implements IWebDriverFactory {
      */
     @Override
     public void hardCloseDriver(){
-        LOGGER.info("Closing driver session", LOGGER);
+        LOGGER.info("Terminating driver session");
         driver = null;
     }
 
@@ -127,7 +127,7 @@ public class WebDriverFactory implements IWebDriverFactory {
             try {
                 return !driver.getWindowHandles().isEmpty();
             } catch (Exception ex){
-                LOGGER.debug("Ignored exception", ex);
+                reporter.ignoredException(ex);
                 return false;
             }
         } else {

@@ -39,6 +39,8 @@ import java.util.Map;
 @Component
 @Profile("chrome")
 public class ChromeExtender {
+    private static final String WIDTH = "width";
+    private static final String HEIGHT = "height";
 
     @Autowired
     private IWebDriverFactory webDriverFactory;
@@ -56,23 +58,27 @@ public class ChromeExtender {
 
     public String takeScreenshotAsString() throws IOException {
         Object visibleSize = evaluate("({x:0,y:0,width:window.innerWidth,height:window.innerHeight})");
-        Long visibleW = jsonValue(visibleSize, "result.value.width", Long.class);
-        Long visibleH = jsonValue(visibleSize, "result.value.height", Long.class);
+        Long value = jsonValue(visibleSize, "result.value.width", Long.class);
+        long visibleW = value != null ? value : 0;
+        value = jsonValue(visibleSize, "result.value.height", Long.class);
+        long visibleH = value != null ? value : 0;
 
         Object contentSize = send("Page.getLayoutMetrics", new HashMap<>());
-        Long cw = jsonValue(contentSize, "contentSize.width", Long.class);
-        Long ch = jsonValue(contentSize, "contentSize.height", Long.class);
+        value = jsonValue(contentSize, "contentSize.width", Long.class);
+        long cw = value != null ? value : 0;
+        value = jsonValue(contentSize, "contentSize.height", Long.class);
+        long ch = value != null ? value : 0;
 
         send("Emulation.setDeviceMetricsOverride",
-                ImmutableMap.of("width", cw, "height", ch, "deviceScaleFactor", Long.valueOf(1), "mobile", Boolean.FALSE, "fitWindow", Boolean.FALSE)
+                ImmutableMap.of(WIDTH, cw, HEIGHT, ch, "deviceScaleFactor", 1, "mobile", Boolean.FALSE, "fitWindow", Boolean.FALSE)
         );
-        send("Emulation.setVisibleSize", ImmutableMap.of("width", cw, "height", ch));
+        send("Emulation.setVisibleSize", ImmutableMap.of(WIDTH, cw, HEIGHT, ch));
 
-        Object value = send("Page.captureScreenshot", ImmutableMap.of("format", "png", "fromSurface", Boolean.TRUE));
+        Object screenshotResponse = send("Page.captureScreenshot", ImmutableMap.of("format", "png", "fromSurface", Boolean.TRUE));
 
-        send("Emulation.setVisibleSize", ImmutableMap.of("x", Long.valueOf(0), "y", Long.valueOf(0), "width", visibleW, "height", visibleH));
+        send("Emulation.setVisibleSize", ImmutableMap.of("x", 0, "y", 0, WIDTH, visibleW, HEIGHT, visibleH));
 
-        return jsonValue(value, "data", String.class);
+        return jsonValue(screenshotResponse, "data", String.class);
     }
 
     public File takeScreenshotAsFile() throws IOException {

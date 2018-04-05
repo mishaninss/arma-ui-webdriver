@@ -20,7 +20,6 @@ import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
 import org.apache.commons.exec.OS;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Provides a single instance of WebDriver
+ * Provides a single instance of WebDriverService
  * @author Sergey Mishanin
  *
  */
