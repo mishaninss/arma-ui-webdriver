@@ -78,16 +78,13 @@ public class SeleniumAspects {
         try {
             callStack.get().push(joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
             LOGGER.trace("call {}", callStack.get());
-            return ConcurrentUtils.runWithTimeout(new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    try {
-                        return joinPoint.proceed();
-                    } catch (Exception ex) {
-                        throw ex;
-                    } catch (Throwable throwable) {
-                        throw new InvocationTargetException(throwable);
-                    }
+            return ConcurrentUtils.runWithTimeout(() -> {
+                try {
+                    return joinPoint.proceed();
+                } catch (Exception ex) {
+                    throw ex;
+                } catch (Throwable throwable) {
+                    throw new InvocationTargetException(throwable);
                 }
             }, uiCommonsProperties.driver().timeoutsDriverOperation, TimeUnit.MILLISECONDS);
         } catch (Throwable e) {
