@@ -161,8 +161,18 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public WdElementDriver clickOnElement(ILocatable element){
-        waitingDriver.waitForElementIsClickable(element);
-        findElement(element).click();
+        WebElement webElement = findElement(element);
+        try {
+            webElement.click();
+        } catch (WebDriverException ex){
+            String message = ex.getMessage();
+            if (StringUtils.isNotBlank(message) && message.contains("is not clickable")){
+                reporter.warn("Сaught element is not clickable exception. Will try JS click");
+                executeJsOnElement("arguments[0].click()", element);
+            } else {
+                throw ex;
+            }
+        }
         return this;
     }
 
