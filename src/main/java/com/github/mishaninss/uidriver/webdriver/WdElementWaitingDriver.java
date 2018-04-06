@@ -31,12 +31,24 @@ import java.time.temporal.TemporalUnit;
 public class WdElementWaitingDriver implements IElementWaitingDriver {
 
     private ILocatable element;
+    private boolean quietly;
 
     @WaitingDriver
     private IWaitingDriver waitingDriver;
 
     public WdElementWaitingDriver(ILocatable element){
         this.element = element;
+    }
+
+    @Override
+    public IElementWaitingDriver quietly() {
+        quietly = true;
+        return this;
+    }
+
+    @Override
+    public boolean isQuietly() {
+        return quietly;
     }
 
     @Override

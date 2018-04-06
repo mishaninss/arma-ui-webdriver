@@ -17,6 +17,7 @@
 package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
+import com.github.mishaninss.html.interfaces.INamed;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
 import com.github.mishaninss.uidriver.Arma;
@@ -305,12 +306,17 @@ public class WdElementDriver implements IElementDriver {
 
     @Override
     public byte[] takeElementScreenshot(ILocatable element){
-        WebElement webElement = findElement(element);
-        if (webElement != null) {
-            return webElement.getScreenshotAs(OutputType.BYTES);
-        } else {
-            return new byte[0];
+        highlightElement(element);
+        String info = element.getLocator();
+        String name = INamed.getLoggableNameIfApplicable(element);
+        if (StringUtils.isNotBlank(name)) {
+            info = name;
         }
+        addElementDebugInfo(element, info, "");
+        byte[] screenshot = arma.page().takeScreenshot();
+        removeElementDebugInfo();
+        unhighlightElement(element);
+        return screenshot;
     }
 
     @Override
