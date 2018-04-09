@@ -209,6 +209,13 @@ public class WdThisElementDriver implements IThisElementDriver {
     }
 
     @Override
+    @FiresEvent(ElementEvent.CHANGE_VALUE)
+    public IThisElementDriver setValue(String value){
+        elementDriver.setValueToElement(element, value);
+        return this;
+    }
+
+    @Override
     public ILocatable getElement() {
         return element;
     }

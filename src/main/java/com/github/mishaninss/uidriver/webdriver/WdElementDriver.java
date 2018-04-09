@@ -427,6 +427,12 @@ public class WdElementDriver implements IElementDriver {
         return ((JavascriptExecutor)webDriverFactory.getDriver()).executeScript(javaScript, webElement);
     }
 
+    @Override
+    public IElementDriver setValueToElement(ILocatable element, String value){
+        executeJsOnElement("arguments[0].value='" + value + "'", element);
+        return this;
+    }
+
     public WebElement findElement(By by){
         return webDriverFactory.getDriver().findElement(by);
     }

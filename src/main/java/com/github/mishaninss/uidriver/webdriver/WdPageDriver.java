@@ -22,6 +22,7 @@ import com.github.mishaninss.reporting.Reporter;
 import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.*;
+import com.github.mishaninss.utils.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -51,12 +52,15 @@ public class WdPageDriver implements IPageDriver {
     private IWaitingDriver waitingDriver;
     @Autowired
     private IScreenshoter screenshoter;
+    @Autowired
+    private UrlUtils urlUtils;
 
     @Override
     public WdPageDriver goToUrl(String url){
-        reporter.info("Open URL " + url);
+        String resolvedUrl = urlUtils.resolveUrl(url);
+        reporter.info("Open URL " + resolvedUrl);
         WebDriver driver = webDriverFactory.getDriver();
-        driver.get(url);
+        driver.get(resolvedUrl);
         try {
             waitingDriver.waitForPageUpdate();
         } catch (UnhandledAlertException ex){

@@ -128,7 +128,7 @@ public class DesiredCapabilitiesLoader {
                         }
                     }
                 );
-        reporter.debug("Desired capabilities loaded from Environment properties: " + capabilities);
+        reporter.debug("Desired capabilities loaded from Environment properties with prefix [" + prefix + "] : " + capabilities);
         return capabilities;
     }
 }
