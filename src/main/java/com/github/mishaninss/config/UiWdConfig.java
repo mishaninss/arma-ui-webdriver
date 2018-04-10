@@ -17,11 +17,11 @@
 package com.github.mishaninss.config;
 
 import com.github.mishaninss.aspects.SeleniumAspects;
+import com.github.mishaninss.uidriver.annotations.*;
 import com.github.mishaninss.uidriver.interfaces.*;
 import com.github.mishaninss.uidriver.webdriver.*;
 import org.aspectj.lang.Aspects;
 import org.springframework.beans.factory.annotation.Autowire;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -35,34 +35,39 @@ public class UiWdConfig {
         return Aspects.aspectOf(SeleniumAspects.class);
     }
 
-    @Bean @Qualifier(IWaitingDriver.QUALIFIER)
+    @Bean(IWaitingDriver.QUALIFIER) @WaitingDriver
     public IWaitingDriver waitingDriver(){
         return new WdWaitingDriver();
     }
 
-    @Bean @Qualifier(IBrowserDriver.QUALIFIER)
+    @Bean(IBrowserDriver.QUALIFIER) @BrowserDriver
     public IBrowserDriver browserDriver(){
         return new WdBrowserDriver();
     }
 
-    @Bean @Qualifier(IElementDriver.QUALIFIER)
+    @Bean(IElementDriver.QUALIFIER) @ElementDriver
     public IElementDriver elementDriver(){
         return new WdElementDriver();
     }
 
-    @Bean @Qualifier(IElementsDriver.QUALIFIER)
+    @Bean(IElementsDriver.QUALIFIER) @ElementsDriver
     public IElementsDriver elementsDriver(){
         return new WdElementsDriver();
     }
 
-    @Bean @Qualifier(IPageDriver.QUALIFIER)
+    @Bean(IPageDriver.QUALIFIER) @PageDriver
     public IPageDriver pageDriver(){
         return new WdPageDriver();
     }
 
-    @Bean @Qualifier(ISelectElementDriver.QUALIFIER)
+    @Bean(ISelectElementDriver.QUALIFIER) @SelectElementDriver
     public ISelectElementDriver selectElementDriver(){
         return new WdSelectElementDriver();
+    }
+
+    @Bean(IAlertHandler.QUALIFIER) @AlertHandler
+    public IAlertHandler alertHandler(){
+        return new WdAlertHandler();
     }
 
 }

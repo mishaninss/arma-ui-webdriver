@@ -24,14 +24,12 @@ import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.*;
 import com.github.mishaninss.utils.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of {@link IPageDriver} interface based on WebDriver engine
@@ -70,55 +68,6 @@ public class WdPageDriver implements IPageDriver {
             }
         }
         return this;
-    }
-
-	@Override
-	public boolean isAlertDisplayed(){
-	    return isAlertDisplayed(false);
-    }
-
-    @Override
-    public boolean isAlertDisplayed(boolean waitForAlert){
-        WebDriver driver = webDriverFactory.getDriver();
-        try{
-            if (waitForAlert){
-                Wait<WebDriver> wait = new WebDriverWait(driver, properties.driver().timeoutsElement/1000);
-                wait.until(ExpectedConditions.alertIsPresent());
-            }
-            driver.switchTo().alert();
-            return true;
-        }catch(Exception ex){
-            reporter.ignoredException(ex);
-            return false;
-        }
-    }
-
-	@Override
-	public WdPageDriver acceptAlert(){
-        Alert alert = getAlert();
-        reporter.info("Accept alert [" + alert.getText() + "]");
-        alert.accept();
-        return this;
-	}
-
-	@Override
-    public WdPageDriver dismissAlert() {
-        Alert alert = getAlert();
-        reporter.info("Dismiss alert [" + alert.getText() + "]");
-        alert.dismiss();
-        return this;
-    }
-
-	@Override
-    public String getAlertMessage(){
-        return getAlert().getText();
-    }
-
-    private Alert getAlert(){
-        WebDriver driver = webDriverFactory.getDriver();
-        Wait<WebDriver> wait = new WebDriverWait(driver, TimeUnit.MILLISECONDS.toSeconds(properties.driver().timeoutsElement));
-        wait.until(ExpectedConditions.alertIsPresent());
-        return driver.switchTo().alert();
     }
 
 	@Override

@@ -125,6 +125,21 @@ public class WdWaitingDriver implements IWaitingDriver {
     }
 
     @Override
+    public void waitForAlertIsPresent(){
+        waitForAlertIsPresent(properties.driver().timeoutsElement, ChronoUnit.MILLIS);
+    }
+
+    @Override
+    public void waitForAlertIsPresent(long timeoutInSeconds){
+        waitForAlertIsPresent(timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    @Override
+    public void waitForAlertIsPresent(long timeout, TemporalUnit unit){
+        performWait(ExpectedConditions.alertIsPresent(), timeout, unit);
+    }
+
+    @Override
     public void waitForPageUpdate(){
         waitForPageUpdate(properties.driver().timeoutsPageLoad, ChronoUnit.MILLIS);
     }
