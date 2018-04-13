@@ -18,6 +18,7 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.uidriver.interfaces.IBrowserDriver;
+import com.github.mishaninss.uidriver.interfaces.ILogEntry;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Dimension;
@@ -26,7 +27,9 @@ import org.openqa.selenium.logging.LogEntries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -86,8 +89,9 @@ public class WdBrowserDriver implements IBrowserDriver {
     }
 
     @Override
-    public LogEntries getLogEntries(String logType){
-        return webDriverFactory.getDriver().manage().logs().get(logType);
+    public List<ILogEntry> getLogEntries(String logType){
+        LogEntries logEntries = webDriverFactory.getDriver().manage().logs().get(logType);
+        return logEntries.getAll().stream().map(WdLogEntry::new).collect(Collectors.toList());
     }
 
     @Override

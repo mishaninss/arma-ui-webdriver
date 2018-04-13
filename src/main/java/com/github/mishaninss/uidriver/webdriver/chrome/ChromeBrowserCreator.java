@@ -19,6 +19,7 @@ package com.github.mishaninss.uidriver.webdriver.chrome;
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.exceptions.FrameworkConfigurationException;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
+import com.github.mishaninss.uidriver.webdriver.IWebDriverCreator;
 import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import org.openqa.selenium.WebDriver;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @Profile("chrome")
-public class ChromeBrowserCreator implements IChromeDriverCreator {
+public class ChromeBrowserCreator implements IWebDriverCreator {
     private static final String COULD_NOT_START_SESSION_MESSAGE = "Could not start a new browser session";
 
     @Autowired

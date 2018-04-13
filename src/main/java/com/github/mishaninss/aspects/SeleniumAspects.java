@@ -67,7 +67,9 @@ public class SeleniumAspects {
             " || call(* org.openqa.selenium.support.ui.ExpectedConditions.* (..))" +
             " || target(org.openqa.selenium.Platform)" +
             " || target(org.openqa.selenium.WebDriver$Options)" +
-            " || target(org.openqa.selenium.WebDriver$Timeouts)")
+            " || target(org.openqa.selenium.WebDriver$Timeouts)" +
+            " || target(org.openqa.selenium.chrome.ChromeDriverService$Builder)" +
+            " || target(org.openqa.selenium.logging.LoggingPreferences)")
     public void ignored() {
         //Declaration of a pointcut for call to any Selenium method
     }
@@ -90,48 +92,61 @@ public class SeleniumAspects {
             callStack.get().clear();
             Throwable cause = e;
 
-            if ((cause instanceof InvocationTargetException || cause instanceof ExecutionException)  && cause.getCause() != null) {
+            if (cause instanceof ExecutionException && cause.getCause() != null) {
                 cause = cause.getCause();
             }
             if (cause instanceof java.util.concurrent.TimeoutException) {
                 cause = new SessionLostException("driver operation timeout", cause);
             }
 
-            if (!(cause instanceof NoSuchElementException
-                    || cause instanceof StaleElementReferenceException
-                    || cause instanceof UnhandledAlertException
-                    || cause instanceof NoAlertPresentException
-                    || cause instanceof TimeoutException)) {
-                LOGGER.warn("Selenium exception during " + joinPoint.getSignature().getName(), cause);
-            }
+            logSeleniumException(joinPoint, cause);
 
             if (isHardSessionLostException(cause, joinPoint)){
-                LOGGER.error("Hard Session lost exception detected", cause);
-                webDriverFactory.hardCloseDriver();
-                elementDriver.clearCache();
-                if (cause instanceof SessionLostException){
-                    throw cause;
-                } else {
-                    throw new SessionLostException("Driver session has been lost", cause);
-                }
+                handleHardSessionLostException(cause);
             } else if (isSessionLostException(cause, joinPoint)) {
-                LOGGER.error("Session lost exception detected", cause);
-                webDriverFactory.closeDriver();
-                elementDriver.clearCache();
-                if (cause instanceof SessionLostException){
-                    throw cause;
-                } else {
-                    throw new SessionLostException("Driver session has been lost", cause);
-                }
+                handleSessionLostException(cause);
             } else if (cause != null){
                 throw cause;
             } else {
-                throw new WebDriverException("Null exception");
+                throw new WebDriverException("Unknown exception");
             }
         } finally {
             if (!callStack.get().isEmpty()) {
                 callStack.get().pop();
             }
+        }
+        return null;
+    }
+
+    private void logSeleniumException(JoinPoint joinPoint, Throwable cause){
+        if (!(cause instanceof NoSuchElementException
+                || cause instanceof StaleElementReferenceException
+                || cause instanceof UnhandledAlertException
+                || cause instanceof NoAlertPresentException
+                || cause instanceof TimeoutException)) {
+            LOGGER.warn("Selenium exception during " + joinPoint.getSignature().getName(), cause);
+        }
+    }
+
+    private void handleHardSessionLostException(Throwable cause){
+        LOGGER.error("Hard Session lost exception detected");
+        webDriverFactory.hardCloseDriver();
+        elementDriver.clearCache();
+        if (cause instanceof SessionLostException){
+            throw (SessionLostException) cause;
+        } else {
+            throw new SessionLostException("Driver session has been lost", cause);
+        }
+    }
+
+    private void handleSessionLostException(Throwable cause){
+        LOGGER.error("Session lost exception detected");
+        webDriverFactory.closeDriver();
+        elementDriver.clearCache();
+        if (cause instanceof SessionLostException){
+            throw (SessionLostException) cause;
+        } else {
+            throw new SessionLostException("Driver session has been lost", cause);
         }
     }
 

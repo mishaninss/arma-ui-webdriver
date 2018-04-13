@@ -79,11 +79,14 @@ public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvi
     private DesiredCapabilities getChromeCapabilities(){
         DesiredCapabilities caps = DesiredCapabilities.chrome();
         caps.setCapability(ChromeOptions.CAPABILITY, getChromeOptions());
-        if (properties.driver().shouldCollectPerfLogs()) {
-            LoggingPreferences logPrefs = new LoggingPreferences();
-            logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
-            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        if (properties.driver().areConsoleLogsEnabled()){
+            logPrefs.enable(LogType.BROWSER, properties.driver().browserLogsLevel);
         }
+        if (properties.driver().shouldCollectPerfLogs()) {
+            logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
+        }
+        caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
         setUnexpectedAlertBehaviour(caps);
         return caps;
     }
