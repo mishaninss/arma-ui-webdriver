@@ -19,9 +19,11 @@ package com.github.mishaninss.uidriver.webdriver;
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
-import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.annotations.WaitingDriver;
-import com.github.mishaninss.uidriver.interfaces.*;
+import com.github.mishaninss.uidriver.interfaces.ILocatable;
+import com.github.mishaninss.uidriver.interfaces.IPageDriver;
+import com.github.mishaninss.uidriver.interfaces.IScreenshoter;
+import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import com.github.mishaninss.utils.UrlUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.JavascriptExecutor;
@@ -44,8 +46,8 @@ public class WdPageDriver implements IPageDriver {
     private WebDriverProperties properties;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    @ElementDriver
-    private IElementDriver elementDriver;
+    @Autowired
+    private WebElementProvider webElementProvider;
     @WaitingDriver
     private IWaitingDriver waitingDriver;
     @Autowired
@@ -145,7 +147,7 @@ public class WdPageDriver implements IPageDriver {
     @Override
     public WdPageDriver switchToFrame(ILocatable frameElement) {
         WebDriver driver = webDriverFactory.getDriver();
-        WebElement webElement = elementDriver.findElement(frameElement);
+        WebElement webElement = webElementProvider.findElement(frameElement);
         driver.switchTo().frame(webElement);
         return this;
     }

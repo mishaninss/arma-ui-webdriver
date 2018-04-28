@@ -23,7 +23,6 @@ import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementsDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -38,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.mishaninss.utils.Keys.*;
 
 /**
  * 
@@ -54,6 +55,8 @@ public class WdElementsDriver implements IElementsDriver {
     private IElementDriver elementDriver;
     @Autowired
     private IWebDriverFactory webDriverFactory;
+    @Autowired
+    private WebElementProvider webElementProvider;
 
     @Override
     public boolean areElementsDisplayed(String locator){
@@ -124,13 +127,13 @@ public class WdElementsDriver implements IElementsDriver {
     }
     
     @Override
-    public WdElementsDriver clickOnElementsWithKeyPressed(String locator, Keys key){
+    public WdElementsDriver clickOnElementsWithKeyPressed(String locator, CharSequence key){
         WebDriver driver = webDriverFactory.getDriver();
         List<WebElement> elements = findElements(locator);
         for (WebElement element: elements){
             waitForElementToBeClickable(element);
             Actions actions = new Actions(driver);
-            actions.keyDown(Keys.CONTROL).click(element).keyUp(Keys.CONTROL).perform();
+            actions.keyDown(CONTROL).click(element).keyUp(CONTROL).perform();
         }
         return this;
     }
@@ -186,7 +189,7 @@ public class WdElementsDriver implements IElementsDriver {
             contextDeque.pollLast();
             if (!contextDeque.isEmpty()) {
                 ILocatable context = contextDeque.poll();
-                contextWebElement = elementDriver.findElement(context);
+                contextWebElement = webElementProvider.findElement(context);
             }
             return findElements(contextWebElement, element.getLocator());
         }

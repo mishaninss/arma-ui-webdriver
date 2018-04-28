@@ -17,8 +17,6 @@
 package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
-import com.github.mishaninss.uidriver.annotations.ElementDriver;
-import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import org.openqa.selenium.JavascriptExecutor;
@@ -39,8 +37,8 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Autowired
     protected IWebDriverFactory webDriverFactory;
-    @ElementDriver
-    private IElementDriver elementDriver;
+    @Autowired
+    private WebElementProvider webElementProvider;
     @Autowired
     private WebDriverProperties properties;
 
@@ -56,7 +54,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementIsVisible(ILocatable element, long timeout, TemporalUnit unit){
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.visibilityOf(webElement), timeout, unit);
     }
 
@@ -72,7 +70,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementIsNotVisible(ILocatable element, long timeout, TemporalUnit unit){
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.invisibilityOf(webElement), timeout, unit);
     }
 
@@ -88,7 +86,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementIsClickable(ILocatable element, long timeout, TemporalUnit unit){
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.elementToBeClickable(webElement), timeout, unit);
     }
 
@@ -104,7 +102,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementToBeSelected(ILocatable element, long timeout, TemporalUnit unit){
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.elementToBeSelected(webElement), timeout, unit);
     }
 
@@ -120,7 +118,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementToBeNotSelected(ILocatable element, long timeout, TemporalUnit unit){
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.elementSelectionStateToBe(webElement, false), timeout, unit);
     }
 

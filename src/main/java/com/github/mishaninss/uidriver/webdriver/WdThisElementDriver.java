@@ -21,9 +21,8 @@ import com.github.mishaninss.html.listeners.FiresEvent;
 import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
+import com.github.mishaninss.uidriver.interfaces.IPoint;
 import com.github.mishaninss.uidriver.interfaces.IThisElementDriver;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.Point;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -121,7 +120,7 @@ public class WdThisElementDriver implements IThisElementDriver {
      */
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public IThisElementDriver clickWithKeyPressed(Keys key){
+    public IThisElementDriver clickWithKeyPressed(CharSequence key){
         elementDriver.clickOnElementWithKeyPressed(element, key);
         return this;
     }
@@ -177,7 +176,7 @@ public class WdThisElementDriver implements IThisElementDriver {
     }
 
     @Override
-    public Point getLocation() {
+    public IPoint getLocation() {
         return elementDriver.getLocation(element);
     }
 

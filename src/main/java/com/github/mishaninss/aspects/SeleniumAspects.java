@@ -18,9 +18,8 @@ package com.github.mishaninss.aspects;
 
 import com.github.mishaninss.data.UiCommonsProperties;
 import com.github.mishaninss.exceptions.SessionLostException;
-import com.github.mishaninss.uidriver.annotations.ElementDriver;
-import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverFactory;
+import com.github.mishaninss.uidriver.webdriver.WebElementProvider;
 import com.github.mishaninss.utils.ConcurrentUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -52,8 +51,8 @@ public class SeleniumAspects {
     private UiCommonsProperties uiCommonsProperties;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    @ElementDriver
-    private IElementDriver elementDriver;
+    @Autowired
+    private WebElementProvider webElementProvider;
 
 	@Pointcut("call(* org.openqa.selenium..* (..))")
 	public void pointcutUiDriverCall() {
@@ -69,7 +68,12 @@ public class SeleniumAspects {
             " || target(org.openqa.selenium.WebDriver$Options)" +
             " || target(org.openqa.selenium.WebDriver$Timeouts)" +
             " || target(org.openqa.selenium.chrome.ChromeDriverService$Builder)" +
-            " || target(org.openqa.selenium.logging.LoggingPreferences)")
+            " || target(org.openqa.selenium.logging.LoggingPreferences)" +
+            " || target(org.openqa.selenium.Point)" +
+            " || target(org.openqa.selenium.logging.LogEntry)" +
+            " || (call(* org.openqa.selenium.interactions.Actions.* (..)) && !call(* org.openqa.selenium.interactions.Actions.perform (..)))" +
+            " || (call(* org.openqa.selenium.support.ui.FluentWait.* (..)) && !call(* org.openqa.selenium.support.ui.FluentWait.until (..)))" +
+            " || target(org.openqa.selenium.Cookie)")
     public void ignored() {
         //Declaration of a pointcut for call to any Selenium method
     }
@@ -79,16 +83,8 @@ public class SeleniumAspects {
         try {
             callStack.get().push(joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
             LOGGER.trace("call {}", callStack.get());
-            return ConcurrentUtils.runWithTimeout(() -> {
-                try {
-                    return joinPoint.proceed();
-                } catch (Exception ex) {
-                    throw ex;
-                } catch (Throwable throwable) {
-                    throw new InvocationTargetException(throwable);
-                }
-            }, uiCommonsProperties.driver().timeoutsDriverOperation, TimeUnit.MILLISECONDS);
-        } catch (Throwable e) {
+            return proceedJoinPoint(joinPoint);
+        } catch (Exception e) {
             callStack.get().clear();
             Throwable cause = e;
 
@@ -118,31 +114,43 @@ public class SeleniumAspects {
         return null;
     }
 
+    private Object proceedJoinPoint(ProceedingJoinPoint joinPoint) throws Exception {
+        return ConcurrentUtils.runWithTimeout(() -> {
+            try {
+                return joinPoint.proceed();
+            } catch (Exception ex) {
+                throw ex;
+            } catch (Throwable throwable) {
+                throw new InvocationTargetException(throwable);
+            }
+        }, uiCommonsProperties.driver().timeoutsDriverOperation, TimeUnit.MILLISECONDS);
+    }
+
     private void logSeleniumException(JoinPoint joinPoint, Throwable cause){
         if (!(cause instanceof NoSuchElementException
                 || cause instanceof StaleElementReferenceException
                 || cause instanceof UnhandledAlertException
                 || cause instanceof NoAlertPresentException
                 || cause instanceof TimeoutException)) {
-            LOGGER.warn("Selenium exception during " + joinPoint.getSignature().getName(), cause);
+            LOGGER.trace("Selenium exception during " + joinPoint.getSignature().getName(), cause);
         }
     }
 
     private void handleHardSessionLostException(Throwable cause){
         LOGGER.error("Hard Session lost exception detected");
         webDriverFactory.hardCloseDriver();
-        elementDriver.clearCache();
-        if (cause instanceof SessionLostException){
-            throw (SessionLostException) cause;
-        } else {
-            throw new SessionLostException("Driver session has been lost", cause);
-        }
+        webElementProvider.clearCache();
+        throwSle(cause);
     }
 
     private void handleSessionLostException(Throwable cause){
         LOGGER.error("Session lost exception detected");
         webDriverFactory.closeDriver();
-        elementDriver.clearCache();
+        webElementProvider.clearCache();
+        throwSle(cause);
+    }
+
+    private void throwSle(Throwable cause){
         if (cause instanceof SessionLostException){
             throw (SessionLostException) cause;
         } else {

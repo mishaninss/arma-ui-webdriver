@@ -92,13 +92,8 @@ public class WebDriverFactory implements IWebDriverFactory {
         if (isBrowserStarted()){
             LOGGER.info("Quit driver");
             try {
-                driver.close();
                 driver.quit();
-            }
-            catch (Exception ex){
-                reporter.ignoredException(ex);
-            }
-            finally{
+            } finally{
                 driver = null;
             }
         }

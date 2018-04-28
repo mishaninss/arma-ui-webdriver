@@ -16,7 +16,9 @@
 
 package com.github.mishaninss.config;
 
+import com.github.mishaninss.aspects.IElementWaitingDriverAspects;
 import com.github.mishaninss.aspects.SeleniumAspects;
+import com.github.mishaninss.aspects.UiDriverAspects;
 import com.github.mishaninss.uidriver.annotations.*;
 import com.github.mishaninss.uidriver.interfaces.*;
 import com.github.mishaninss.uidriver.webdriver.*;
@@ -33,6 +35,16 @@ public class UiWdConfig {
     @Bean(autowire = Autowire.BY_TYPE)
     public SeleniumAspects seleniumAspects() {
         return Aspects.aspectOf(SeleniumAspects.class);
+    }
+
+    @Bean
+    public UiDriverAspects uiDriverAspects() {
+        return Aspects.aspectOf(UiDriverAspects.class);
+    }
+
+    @Bean
+    public IElementWaitingDriverAspects iElementWaitingDriverAspects() {
+        return Aspects.aspectOf(IElementWaitingDriverAspects.class);
     }
 
     @Bean(IWaitingDriver.QUALIFIER) @WaitingDriver

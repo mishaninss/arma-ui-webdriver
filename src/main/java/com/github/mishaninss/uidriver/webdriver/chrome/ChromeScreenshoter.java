@@ -16,7 +16,7 @@
 
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
-import com.github.mishaninss.uidriver.interfaces.IScreenshoter;
+import com.github.mishaninss.uidriver.webdriver.WdDefaultScreenshoter;
 import org.openqa.selenium.OutputType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -26,28 +26,20 @@ import java.io.IOException;
 
 @Component
 @Profile("chrome")
-public class ChromeScreenshoter implements IScreenshoter {
+public class ChromeScreenshoter extends WdDefaultScreenshoter {
 
     @Autowired
     private ChromeExtender chromeExtender;
 
     @Override
-    public byte[] takeScreenshot() {
+    @SuppressWarnings("unchecked")
+    protected  <X> X takeScreenshot(OutputType<X> seleniumOutputType) {
         try {
-            return chromeExtender.takeScreenshot();
-        } catch (IOException e) {
-            return new byte[0];
-        }
-    }
-
-    @Override
-    public <X> X takeScreenshotAs(OutputType<X> outputType) {
-        try {
-            if (OutputType.BASE64.equals(outputType)) {
+            if (OutputType.BASE64.equals(seleniumOutputType)) {
                 return (X) chromeExtender.takeScreenshotAsString();
-            } else if (OutputType.BYTES.equals(outputType)) {
+            } else if (OutputType.BYTES.equals(seleniumOutputType)) {
                 return (X) chromeExtender.takeScreenshot();
-            } else if (OutputType.FILE.equals(outputType)) {
+            } else if (OutputType.FILE.equals(seleniumOutputType)) {
                 return (X) chromeExtender.takeScreenshotAsFile();
             } else {
                 return null;

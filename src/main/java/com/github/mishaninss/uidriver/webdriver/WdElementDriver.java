@@ -24,8 +24,8 @@ import com.github.mishaninss.uidriver.Arma;
 import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
+import com.github.mishaninss.uidriver.interfaces.IPoint;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.internal.Locatable;
@@ -35,10 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -57,9 +53,8 @@ public class WdElementDriver implements IElementDriver {
     private IWaitingDriver waitingDriver;
     @Autowired
     private Arma arma;
-    
-    /**  WebElements cache */
-    private final Map<ILocatable, WebElement> elements = new HashMap<>();
+    @Autowired
+    private WebElementProvider webElementProvider;
 
     /**
      * Performs scrolling to make the element visible on screen
@@ -68,7 +63,7 @@ public class WdElementDriver implements IElementDriver {
     @Override
     public WdElementDriver scrollToElement(ILocatable element){
         WebDriver driver = webDriverFactory.getDriver();
-        WebElement webElement = findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(false)", webElement);
         return this;
     }
@@ -109,7 +104,7 @@ public class WdElementDriver implements IElementDriver {
             webDriverFactory.setWaitingTimeout(0);
         }
         try{
-            WebElement webElement = findElement(element);
+            WebElement webElement = webElementProvider.findElement(element);
             if (waitForElement){
                 new WebDriverWait(webDriverFactory.getDriver(), properties.driver().timeoutsElement)
                         .until(ExpectedConditions.visibilityOf(webElement));
@@ -132,7 +127,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public boolean isElementEnabled(ILocatable element){
-        return findElement(element).isEnabled();
+        return webElementProvider.findElement(element).isEnabled();
     }
 
     /**
@@ -142,7 +137,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public boolean isElementSelected(ILocatable element){
-        return findElement(element).isSelected();
+        return webElementProvider.findElement(element).isSelected();
     }
 
     /**
@@ -153,7 +148,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public String getAttributeOfElement(ILocatable element, String attribute){
-        return findElement(element).getAttribute(attribute);
+        return webElementProvider.findElement(element).getAttribute(attribute);
     }
 
     /**
@@ -162,7 +157,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public WdElementDriver clickOnElement(ILocatable element){
-        WebElement webElement = findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         try {
             webElement.click();
         } catch (WebDriverException ex){
@@ -183,7 +178,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public WdElementDriver simpleClickOnElement(ILocatable element){
-        findElement(element).click();
+        webElementProvider.findElement(element).click();
         return this;
     }
 
@@ -193,7 +188,7 @@ public class WdElementDriver implements IElementDriver {
      * @param key - pressed key
      */
     @Override
-    public WdElementDriver clickOnElementWithKeyPressed(ILocatable element, Keys key){
+    public WdElementDriver clickOnElementWithKeyPressed(ILocatable element, CharSequence key){
         waitingDriver.waitForElementIsClickable(element);
         arma.actionsChain()
                 .keyDown(key)
@@ -210,7 +205,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public String getTextFromElement(ILocatable element){
-        return findElement(element).getText();
+        return webElementProvider.findElement(element).getText();
     }
 
     /**
@@ -220,7 +215,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public String getFullTextFromElement(ILocatable element){
-        return findElement(element).getAttribute("textContent");
+        return webElementProvider.findElement(element).getAttribute("textContent");
     }
 
     /**
@@ -230,7 +225,7 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public WdElementDriver sendKeysToElement(ILocatable element, CharSequence... keysToSend){
-        findElement(element).sendKeys(keysToSend);
+        webElementProvider.findElement(element).sendKeys(keysToSend);
         return this;
     }
 
@@ -240,68 +235,8 @@ public class WdElementDriver implements IElementDriver {
      */
     @Override
     public WdElementDriver clearElement(ILocatable element){
-        findElement(element).clear();
+        webElementProvider.findElement(element).clear();
         return this;
-    }
-
-    @Override
-    public WebElement findElement(ILocatable element){
-        if (!element.useContextLookup()){
-            WebElement webElement = findElement(null, element.getLocator());
-            elements.put(element, webElement);
-            return webElement;
-        } else {
-            Deque<ILocatable> elementsStack = element.getRealLocatableObjectDeque();
-
-            WebElement contextElement = null;
-            WebElement webElement = null;
-            while (!elementsStack.isEmpty()) {
-                ILocatable nextElement = elementsStack.pop();
-                webElement = cacheLookup(nextElement);
-                if (webElement == null) {
-                    String locator = nextElement.getLocator();
-                    Object[] indexCheck = LocatorConverter.checkForIndex(locator);
-                    if (ArrayUtils.isEmpty(indexCheck)) {
-                        webElement = findElement(contextElement, locator);
-                    } else {
-                        webElement = findElement(contextElement, indexCheck[1].toString(), (Integer) indexCheck[0]);
-                    }
-                    elements.put(nextElement, webElement);
-                }
-                contextElement = webElement;
-            }
-            if (webElement == null){
-                throw new NoSuchElementException("Cannot find element " + StringUtils.join(element.getLocatorDeque(), " -> "));
-            }
-            return webElement;
-        }
-    }
-
-    private WebElement cacheLookup(ILocatable element){
-        return elements.get(element);
-    }
-
-    private WebElement findElement(WebElement context, String locator) {
-        WebDriver driver = webDriverFactory.getDriver();
-        if (context == null) {
-            return driver.findElement(LocatorConverter.toBy(locator));
-        } else {
-            return context.findElement(LocatorConverter.toBy(locator));
-        }
-    }
-
-    private WebElement findElement(WebElement context, String locator, int index) {
-        WebDriver driver = webDriverFactory.getDriver();
-        List<WebElement> webElements;
-        if (context == null) {
-            webElements = driver.findElements(LocatorConverter.toBy(locator));
-        } else {
-            webElements = context.findElements(LocatorConverter.toBy(locator));
-        }
-        if (webElements.size() < index) {
-            throw new NoSuchElementException("Cannot find element [" + locator + "] with index [" + index + "]");
-        }
-        return webElements.get(index - 1);
     }
 
     @Override
@@ -321,13 +256,13 @@ public class WdElementDriver implements IElementDriver {
 
     @Override
     public void clearCache(){
-        elements.clear();
+        webElementProvider.clearCache();
     }
 
     @Override
     public void highlightElement(ILocatable element){
         try {
-            WebElement webElement = findElement(element);
+            WebElement webElement = webElementProvider.findElement(element);
             highlightElement(webElement);
         } catch (Exception ex){
             reporter.ignoredException(ex);
@@ -342,7 +277,7 @@ public class WdElementDriver implements IElementDriver {
 
     @Override
     public void unhighlightElement(ILocatable element){
-        WebElement webElement = findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         try {
             unhighlightElement(webElement);
         } catch(Exception ex){
@@ -359,7 +294,7 @@ public class WdElementDriver implements IElementDriver {
     @Override
     public void addElementDebugInfo(ILocatable element, final String info, final String tooltip){
         WebDriver driver = webDriverFactory.getDriver();
-        WebElement webElement = findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         if (webElement != null) {
             Point point = ((Locatable) webElement).getCoordinates().inViewPort();
             int x = point.x;
@@ -395,12 +330,12 @@ public class WdElementDriver implements IElementDriver {
 
     @Override
     public String getTagName(ILocatable element) {
-        return findElement(element).getTagName();
+        return webElementProvider.findElement(element).getTagName();
     }
 
     @Override
-    public Point getLocation(ILocatable element) {
-        return findElement(element).getLocation();
+    public IPoint getLocation(ILocatable element) {
+        return new WdPoint(webElementProvider.findElement(element).getLocation());
     }
 
     @Override
@@ -423,7 +358,7 @@ public class WdElementDriver implements IElementDriver {
 
     @Override
     public Object executeJsOnElement(String javaScript, ILocatable element){
-        WebElement webElement = findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         return ((JavascriptExecutor)webDriverFactory.getDriver()).executeScript(javaScript, webElement);
     }
 

@@ -19,10 +19,8 @@ package com.github.mishaninss.uidriver.webdriver;
 import com.github.mishaninss.html.interfaces.INamed;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
-import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.IActionsChain;
-import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import org.openqa.selenium.WebElement;
@@ -39,8 +37,8 @@ import java.util.Arrays;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WdActionsChain implements IActionsChain {
-    @ElementDriver
-    private IElementDriver elementDriver;
+    @Autowired
+    private WebElementProvider webElementProvider;
     @WaitingDriver
     private IWaitingDriver waitingDriver;
     @Reporter
@@ -77,7 +75,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain click(ILocatable element) {
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         actions.click(webElement);
         addActionLog("Click on %s", element);
         return this;
@@ -85,7 +83,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain moveToElement(ILocatable element) {
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         actions.moveToElement(webElement);
         addActionLog("Move to %s", element);
         return this;
@@ -93,7 +91,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain moveToElement(ILocatable element, int xOffset, int yOffset) {
-        WebElement webElement = elementDriver.findElement(element);
+        WebElement webElement = webElementProvider.findElement(element);
         actions.moveToElement(webElement, xOffset, yOffset);
         addActionLog("Move to %s with offset (%d, %d)", element, xOffset, yOffset);
         return this;
@@ -122,7 +120,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain keyDown(ILocatable target, CharSequence key) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.keyDown(webElement, key);
         addActionLog("Key down [%s] on %s", key, target);
         return this;
@@ -137,7 +135,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain keyUp(ILocatable target, CharSequence key) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.keyDown(webElement, key);
         addActionLog("Key up [%s] on %s", key, target);
         return this;
@@ -152,7 +150,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain sendKeys(ILocatable target, CharSequence... keys) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.sendKeys(webElement, keys);
         addActionLog("Send keys %s to %s", Arrays.toString(keys), target);
         return this;
@@ -160,7 +158,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain clickAndHold(ILocatable target) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.clickAndHold(webElement);
         addActionLog("Click on %s and hold", target);
         return this;
@@ -175,7 +173,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain release(ILocatable target) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.release(webElement);
         addActionLog("Release on %s", target);
         return this;
@@ -197,7 +195,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain doubleClick(ILocatable target) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.doubleClick(webElement);
         addActionLog("Double click on %s", target);
         return this;
@@ -219,7 +217,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain contextClick(ILocatable target) {
-        WebElement webElement = elementDriver.findElement(target);
+        WebElement webElement = webElementProvider.findElement(target);
         actions.contextClick(webElement);
         addActionLog("Context click on %s", target);
         return this;
@@ -234,8 +232,8 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain dragAndDrop(ILocatable source, ILocatable target) {
-        WebElement sourceWebElement = elementDriver.findElement(source);
-        WebElement targetWebElement = elementDriver.findElement(target);
+        WebElement sourceWebElement = webElementProvider.findElement(source);
+        WebElement targetWebElement = webElementProvider.findElement(target);
         actions.dragAndDrop(sourceWebElement, targetWebElement);
         addActionLog("Drag and drop from %s to %s", source, target);
         return this;
@@ -243,7 +241,7 @@ public class WdActionsChain implements IActionsChain {
 
     @Override
     public IActionsChain dragAndDropBy(ILocatable source, int xOffset, int yOffset) {
-        WebElement sourceWebElement = elementDriver.findElement(source);
+        WebElement sourceWebElement = webElementProvider.findElement(source);
         actions.dragAndDropBy(sourceWebElement, xOffset, yOffset);
         addActionLog("Drag and drop %s by offset (%d, %d)", source, xOffset, yOffset);
         return this;

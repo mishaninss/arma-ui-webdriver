@@ -18,6 +18,7 @@ package com.github.mishaninss.uidriver.webdriver;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.uidriver.interfaces.IBrowserDriver;
+import com.github.mishaninss.uidriver.interfaces.ICookie;
 import com.github.mishaninss.uidriver.interfaces.ILogEntry;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Cookie;
@@ -54,18 +55,21 @@ public class WdBrowserDriver implements IBrowserDriver {
     }
 
     @Override
-    public Set<Cookie> getAllCookies() {
-        return webDriverFactory.getDriver().manage().getCookies();
+    public Set<ICookie> getAllCookies() {
+        Set<Cookie> seleniumCookies = webDriverFactory.getDriver().manage().getCookies();
+        return seleniumCookies.stream().map(WdCookie::new).collect(Collectors.toSet());
     }
 
     @Override
-    public void addCookie(Cookie cookie) {
-        webDriverFactory.getDriver().manage().addCookie(cookie);
+    public void addCookie(ICookie cookie) {
+        if (cookie instanceof WdCookie) {
+            webDriverFactory.getDriver().manage().addCookie(((WdCookie) cookie).toSeleniumCookie());
+        }
     }
 
     @Override
-    public Cookie getCookieNamed(String cookieName) {
-        return webDriverFactory.getDriver().manage().getCookieNamed(cookieName);
+    public ICookie getCookieNamed(String cookieName) {
+        return new WdCookie(webDriverFactory.getDriver().manage().getCookieNamed(cookieName));
     }
 
     @Override

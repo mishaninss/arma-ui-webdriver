@@ -16,8 +16,6 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
-import com.github.mishaninss.uidriver.annotations.ElementDriver;
-import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.ISelectElementDriver;
 import org.openqa.selenium.WebDriver;
@@ -35,8 +33,8 @@ import java.util.List;
  */
 @Component
 public class WdSelectElementDriver implements ISelectElementDriver {
-    @ElementDriver
-    private IElementDriver elementDriver;
+    @Autowired
+    private WebElementProvider webElementProvider;
     @Autowired
     IWebDriverFactory webDriverFactory;
 
@@ -47,7 +45,7 @@ public class WdSelectElementDriver implements ISelectElementDriver {
     }
 
     private Select findSelectElement(ILocatable element){
-        return new Select(elementDriver.findElement(element));
+        return new Select(webElementProvider.findElement(element));
     }
    
     @Override

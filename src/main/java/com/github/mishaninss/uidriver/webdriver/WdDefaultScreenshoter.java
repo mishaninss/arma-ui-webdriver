@@ -16,6 +16,9 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
+import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.interfaces.IOutputType;
 import com.github.mishaninss.uidriver.interfaces.IScreenshoter;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -23,20 +26,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 @Profile("!chrome")
 public class WdDefaultScreenshoter implements IScreenshoter {
 
     @Autowired
     private IWebDriverFactory webDriverFactory;
+    @Reporter
+    private IReporter reporter;
 
     @Override
     public byte[] takeScreenshot() {
-        return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(OutputType.BYTES);
+        try {
+            return takeScreenshotAs(IOutputType.BYTES);
+        } catch (Exception ex){
+            reporter.debug("Could not take a screenshot", ex);
+            return new byte[0];
+        }
     }
 
     @Override
-    public <X> X takeScreenshotAs(OutputType<X> outputType) {
-        return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(outputType);
+    @SuppressWarnings("unchecked")
+    public <X> X takeScreenshotAs(IOutputType<X> outputType) {
+        Class<?> clazz = outputType.getMyType();
+        if (String.class.equals(clazz)){
+            return (X) takeScreenshot(OutputType.BASE64);
+        }
+        if (byte[].class.equals(clazz)){
+            return (X) takeScreenshot(OutputType.BYTES);
+        }
+        if (File.class.equals(clazz)){
+            return (X) takeScreenshot(OutputType.FILE);
+        }
+        throw new IllegalArgumentException("Unsupported format of output type " + clazz);
+    }
+
+    protected <X> X takeScreenshot(OutputType<X> seleniumOutputType){
+        return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(seleniumOutputType);
     }
 }
