@@ -23,7 +23,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.openqa.selenium.TimeoutException;
 
 @SuppressWarnings("unused")
 @Aspect
@@ -44,7 +43,7 @@ public class IElementWaitingDriverAspects {
         if (elementWaitingDriver.isQuietly()){
             try {
                 return joinPoint.proceed();
-            } catch (TimeoutException ex){
+            } catch (Exception ex){
                 reporter.debug("", ex);
                 return null;
             }

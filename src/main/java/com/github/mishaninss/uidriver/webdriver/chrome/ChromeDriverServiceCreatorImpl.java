@@ -25,12 +25,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Provides a single instance of WebDriverService
- * @author Sergey Mishanin
  *
+ * @author Sergey Mishanin
  */
 @Component
 @Profile("chrome")
@@ -40,46 +42,45 @@ public class ChromeDriverServiceCreatorImpl implements IChromeDriverServiceCreat
     private IReporter reporter;
 
     private static final AtomicBoolean useCliCleanup = new AtomicBoolean(true);
-    private volatile ChromeDriverService chromeDriverService;
+    private volatile Set<ChromeDriverService> chromeDriverServices = new HashSet<>();
 
     @PreDestroy
-    protected void destroy(){
+    protected void destroy() {
         terminateChrome();
     }
 
     public ChromeDriverService getChromeDriverService() {
-        if (chromeDriverService == null){
-            chromeDriverService = new ChromeDriverService.Builder()
-                    .withSilent(true)
-                    .usingAnyFreePort()
-                    .build();
-        }
+        ChromeDriverService chromeDriverService = new ChromeDriverService.Builder()
+                .withSilent(true)
+                .usingAnyFreePort()
+                .build();
+        chromeDriverServices.add(chromeDriverService);
+
         return chromeDriverService;
     }
 
-    public void dismissChromeDriverService(){
-        if (chromeDriverService != null){
-            chromeDriverService.stop();
-            chromeDriverService = null;
-        }
+    public void dismissChromeDriverService() {
+        //TODO this method is useless in the current implementation
     }
 
     public void terminateChrome() {
-        if (chromeDriverService != null) {
-            try {
-                if (OS.isFamilyUnix() && useCliCleanup.get()) {
-                    int port = chromeDriverService.getUrl().getPort();
-                    String sh = "for drv in $(pgrep -f \"chromedriver --port=" + port + "\");do for p in $(pgrep -P $drv);do kill -KILL $p;done;kill -KILL $drv;done;";
-                    reporter.debug(sh);
-                    String[] command = {"/bin/bash", "-c", sh};
-                    Runtime.getRuntime().exec(command);
+        chromeDriverServices.forEach(chromeDriverService -> {
+                    try {
+                        if (OS.isFamilyUnix() && useCliCleanup.get()) {
+                            int port = chromeDriverService.getUrl().getPort();
+                            String sh = "for drv in $(pgrep -f \"chromedriver --port=" + port + "\");do for p in $(pgrep -P $drv);do kill -KILL $p;done;kill -KILL $drv;done;";
+                            reporter.debug(sh);
+                            String[] command = {"/bin/bash", "-c", sh};
+                            Runtime.getRuntime().exec(command);
+                        }
+                    } catch (IOException e) {
+                        useCliCleanup.set(false);
+                        reporter.ignoredException(e);
+                    } finally {
+                        chromeDriverService.stop();
+                    }
                 }
-            } catch (IOException e) {
-                useCliCleanup.set(false);
-                reporter.ignoredException(e);
-            } finally {
-                dismissChromeDriverService();
-            }
-        }
+        );
+        chromeDriverServices.clear();
     }
 }

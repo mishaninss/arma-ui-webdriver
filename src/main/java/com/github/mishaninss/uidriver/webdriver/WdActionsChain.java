@@ -100,7 +100,7 @@ public class WdActionsChain implements IActionsChain {
     @Override
     public IActionsChain pause(long pause) {
         actions.pause(pause);
-        addActionLog("Pause for %d milliseconds");
+        addActionLog("Pause for %d milliseconds", pause);
         return this;
     }
 

@@ -31,6 +31,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,10 +52,14 @@ public class WebDriverFactory implements IWebDriverFactory {
     @Autowired
     private IWebDriverCreator webDriverCreator;
 
+    private Map<String, WebDriver> namedDrivers = new HashMap<>();
+
+    private volatile String currentSessionName = DEFAULT_DRIVER_NAME;
     private volatile WebDriver driver;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebDriverFactory.class);
     private static final ThreadLocal<IWebDriverFactory> INSTANCES = new ThreadLocal<>();
+    private static final String DEFAULT_DRIVER_NAME = "DEFAULT_DRIVER";
     protected DesiredCapabilities desiredCapabilities;
 
     @PostConstruct
@@ -62,7 +69,7 @@ public class WebDriverFactory implements IWebDriverFactory {
 
     @PreDestroy
     protected void destroy(){
-        closeDriver();
+        closeAllSessions();
         INSTANCES.remove();
     }
 
@@ -76,12 +83,39 @@ public class WebDriverFactory implements IWebDriverFactory {
      * @return an instance of WebDriver
      */
     @Override
-    public synchronized WebDriver getDriver(){
+    public WebDriver getDriver(){
         if (!isBrowserStarted()){
-            LOGGER.info("Starting driver session");
+            LOGGER.info("Starting driver session [{}]", currentSessionName);
             driver = webDriverCreator.createDriver(desiredCapabilities);
+            namedDrivers.put(currentSessionName, driver);
         }
         return driver;
+    }
+
+    @Override
+    public void switchToSession(String sessionName){
+        currentSessionName = sessionName;
+        driver = namedDrivers.get(sessionName);
+    }
+
+    @Override
+    public void switchToDefaultSession(){
+        switchToSession(DEFAULT_DRIVER_NAME);
+    }
+
+    @Override
+    public void closeSession(String sessionName){
+        switchToSession(sessionName);
+        closeDriver();
+    }
+
+    @Override
+    public void closeAllSessions(){
+        new HashSet<>(namedDrivers.keySet()).forEach(sessionName -> {
+            switchToSession(sessionName);
+            closeDriver();
+        });
+        namedDrivers.clear();
     }
 
     /**
@@ -90,11 +124,12 @@ public class WebDriverFactory implements IWebDriverFactory {
     @Override
     public void closeDriver(){
         if (isBrowserStarted()){
-            LOGGER.info("Quit driver");
+            LOGGER.info("Quit driver [{}]", currentSessionName);
             try {
                 driver.quit();
             } finally{
                 driver = null;
+                namedDrivers.remove(currentSessionName);
             }
         }
     }
@@ -104,8 +139,9 @@ public class WebDriverFactory implements IWebDriverFactory {
      */
     @Override
     public void hardCloseDriver(){
-        LOGGER.info("Terminating driver session");
+        LOGGER.info("Terminating driver session [{}]", currentSessionName);
         driver = null;
+        namedDrivers.remove(currentSessionName);
     }
 
     /**

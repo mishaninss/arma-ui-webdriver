@@ -33,6 +33,14 @@ public interface IWebDriverFactory {
      */
     WebDriver getDriver();
 
+    void switchToSession(String sessionName);
+
+    void switchToDefaultSession();
+
+    void closeSession(String sessionName);
+
+    void closeAllSessions();
+
     /**
      * Closes a browser and nulls WebDriver instance
      */

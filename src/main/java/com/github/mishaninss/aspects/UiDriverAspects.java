@@ -49,7 +49,17 @@ public class UiDriverAspects {
         //Declaration of a pointcut for call to any IElementsDriver interface method
     }
 
-    @Around("pointcutIElementDriverCall() || pointcutIElementsDriverCall() || pointcutIPageDriverCall()")
+    @Pointcut("execution(* com.github.mishaninss.uidriver.interfaces.IWaitingDriver.* (..))" )
+    public void pointcutIWaitingDriverCall() {
+        //Declaration of a pointcut for call to any IElementsDriver interface method
+    }
+
+    @Pointcut("execution(* com.github.mishaninss.uidriver.webdriver.WebElementProvider.* (..))" )
+    public void pointcutWebElementProviderExecution() {
+        //Declaration of a pointcut for call to any IElementsDriver interface method
+    }
+
+    @Around("pointcutIElementDriverCall() || pointcutIElementsDriverCall() || pointcutIPageDriverCall() || pointcutIWaitingDriverCall() || pointcutWebElementProviderExecution()")
     public Object adviceAroundIElementDriverMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         LOGGER.trace("call [{}.{}]",joinPoint.getSignature().getDeclaringTypeName(),joinPoint.getSignature().getName());
         try {

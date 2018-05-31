@@ -22,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,7 @@ import java.util.Map;
 
 @Component
 public class WebElementProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebElementProvider.class);
 
     @Autowired
     private IWebDriverFactory webDriverFactory;
@@ -45,12 +48,19 @@ public class WebElementProvider {
 
     public WebElement findElement(ILocatable element){
         if (!element.useContextLookup()){
-            WebElement webElement = findElement(null, element.getLocator());
+            String locator = element.getLocator();
+            Object[] indexCheck = LocatorConverter.checkForIndex(locator);
+            WebElement webElement;
+            if (ArrayUtils.isEmpty(indexCheck)) {
+                webElement = findElement(null, locator);
+            } else {
+                webElement = findElement(null, indexCheck[1].toString(), (Integer) indexCheck[0]);
+            }
             elements.put(element, webElement);
             return webElement;
         } else {
             Deque<ILocatable> elementsStack = element.getRealLocatableObjectDeque();
-
+            LOGGER.trace("Locatable deque: {}", elementsStack);
             WebElement contextElement = null;
             WebElement webElement = null;
             while (!elementsStack.isEmpty()) {
@@ -82,8 +92,10 @@ public class WebElementProvider {
     private WebElement findElement(WebElement context, String locator) {
         WebDriver driver = webDriverFactory.getDriver();
         if (context == null) {
+            LOGGER.trace("find element {}", locator);
             return driver.findElement(LocatorConverter.toBy(locator));
         } else {
+            LOGGER.trace("find element {} {}", context, locator);
             return context.findElement(LocatorConverter.toBy(locator));
         }
     }
@@ -92,8 +104,10 @@ public class WebElementProvider {
         WebDriver driver = webDriverFactory.getDriver();
         List<WebElement> webElements;
         if (context == null) {
+            LOGGER.trace("find element {} [{}]", locator, index);
             webElements = driver.findElements(LocatorConverter.toBy(locator));
         } else {
+            LOGGER.trace("find element {} {} [{}]", context, locator, index);
             webElements = context.findElements(LocatorConverter.toBy(locator));
         }
         if (webElements.size() < index) {

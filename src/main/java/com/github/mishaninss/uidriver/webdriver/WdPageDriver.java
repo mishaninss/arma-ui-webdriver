@@ -84,17 +84,36 @@ public class WdPageDriver implements IPageDriver {
         return this;
     }
 
-	@Override
-	public Object executeJS(String javaScript){
-	    WebDriver driver = webDriverFactory.getDriver();
-	    return ((JavascriptExecutor)driver).executeScript(javaScript);
-	}
+    @Override
+    public Object executeAsyncJS(String javaScript){
+        WebDriver driver = webDriverFactory.getDriver();
+        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript);
+    }
+
+    @Override
+    public Object executeAsyncJS(String javaScript, Object... args){
+        WebDriver driver = webDriverFactory.getDriver();
+        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript, args);
+    }
+
+    @Override
+    public Object executeAsyncJS(String javaScript, ILocatable element, Object... args){
+        WebDriver driver = webDriverFactory.getDriver();
+        WebElement webElement = webElementProvider.findElement(element);
+        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript, webElement, args);
+    }
+
+    @Override
+    public Object executeJS(String javaScript){
+        WebDriver driver = webDriverFactory.getDriver();
+        return ((JavascriptExecutor)driver).executeScript(javaScript);
+    }
 
 	@Override
-    public Object executeJS(String javaScript, String locator){
+    public Object executeJS(String javaScript, String locator, Object... args){
         WebDriver driver = webDriverFactory.getDriver();
-        WebElement element = driver.findElement(LocatorConverter.toBy(locator));
-        return ((JavascriptExecutor)driver).executeScript(javaScript, element);
+        WebElement webElement = driver.findElement(LocatorConverter.toBy(locator));
+        return ((JavascriptExecutor)driver).executeScript(javaScript, webElement, args);
     }
 
 	@Override
