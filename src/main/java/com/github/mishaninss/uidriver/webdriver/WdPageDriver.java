@@ -119,7 +119,9 @@ public class WdPageDriver implements IPageDriver {
 	@Override
 	public String getCurrentUrl(){
 	    WebDriver driver = webDriverFactory.getDriver();
-	    return driver.getCurrentUrl();
+	    String url =  driver.getCurrentUrl();
+	    reporter.debug("Current URL {}", url);
+	    return url;
 	}
 
 	@Override

@@ -135,6 +135,21 @@ public class WdWaitingDriver implements IWaitingDriver {
     }
 
     @Override
+    public void waitForUrlToBe(String url) {
+        waitForUrlToBe(url, properties.driver().timeoutsElement, ChronoUnit.MILLIS);
+    }
+
+    @Override
+    public void waitForUrlToBe(String url, long timeoutInSeconds) {
+        waitForUrlToBe(url, timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    @Override
+    public void waitForUrlToBe(String url, long timeout, TemporalUnit unit) {
+        performWait(ExpectedConditions.urlToBe(url), timeout, unit);
+    }
+
+    @Override
     public void waitForAlertIsPresent() {
         waitForAlertIsPresent(properties.driver().timeoutsElement, ChronoUnit.MILLIS);
     }
@@ -169,14 +184,17 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     private void detectWaitForPageUpdateMethod() {
         if (isJQuery()) {
+            reporter.debug("jQuery detected");
             waitForPageUpdateMethod =
                     (timeout, unit) -> performWait(isJQueryCompleted, timeout, unit);
             return;
         }
 
         if (isAngular()) {
+            reporter.debug("Angular detected");
             boolean angularHttpSupported = isAngularHttpSupported();
             if (angularHttpSupported) {
+                reporter.debug("Angular http waiter supported");
                 waitForPageUpdateMethod = (timeout, unit) -> {
                     performWait(isAngularHttpCompleted, timeout, unit);
                 };
@@ -184,6 +202,7 @@ public class WdWaitingDriver implements IWaitingDriver {
             }
         }
 
+        reporter.debug("Using default page load waiter");
         waitForPageUpdateMethod = (timeout, unit) -> performWait(IS_DOC_READY_STATE_COMPLETED, timeout, unit);
     }
 

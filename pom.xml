@@ -60,7 +60,7 @@
 
     <properties>
         <selenium.version>3.11.0</selenium.version>
-        <aspectj.version>1.8.12</aspectj.version>
+        <aspectj.version>1.9.1</aspectj.version>
         <arma.ui.commons.version>1.0-SNAPSHOT</arma.ui.commons.version>
     </properties>
 
@@ -183,7 +183,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.10</version>
+                <version>1.11</version>
                 <configuration>
                     <complianceLevel>1.8</complianceLevel>
                     <source>1.8</source>
