@@ -179,7 +179,6 @@ public class WdWaitingDriver implements IWaitingDriver {
             if (angularHttpSupported) {
                 waitForPageUpdateMethod = (timeout, unit) -> {
                     performWait(isAngularHttpCompleted, timeout, unit);
-                    waitForAngularDocumentStable();
                 };
                 return;
             }
@@ -209,11 +208,6 @@ public class WdWaitingDriver implements IWaitingDriver {
             reporter.ignoredException(ex);
             return false;
         }
-    }
-
-    private void waitForAngularDocumentStable() {
-        JavascriptExecutor js = (JavascriptExecutor) webDriverFactory.getDriver();
-        js.executeAsyncScript(ANGULAR_DOCUMENT_STABLE);
     }
 
     protected void performWait(ExpectedCondition<?> condition, long timeout, TemporalUnit unit) {
@@ -246,13 +240,6 @@ public class WdWaitingDriver implements IWaitingDriver {
      * JavaScript code to check if all the ajax requests completed
      */
     private static final String DOC_READY_STATE_COMPLETE = "return window.document.readyState === 'complete';";
-
-    /**
-     * JavaScript code to check if all the ajax requests completed
-     */
-    private static final String ANGULAR_DOCUMENT_STABLE =
-            "var callback = arguments[arguments.length - 1];"
-                    + "window.angular.getTestability('body').whenStable(callback);";
 
     private final ExpectedCondition<Object> isJQueryCompleted = (WebDriver webDriver) -> {
         Preconditions.checkArgument(webDriver != null);
