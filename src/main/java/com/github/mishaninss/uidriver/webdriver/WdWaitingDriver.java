@@ -19,6 +19,8 @@ package com.github.mishaninss.uidriver.webdriver;
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
+import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import com.google.common.base.Preconditions;
@@ -43,6 +45,8 @@ public class WdWaitingDriver implements IWaitingDriver {
     protected IWebDriverFactory webDriverFactory;
     @Autowired
     private WebElementProvider webElementProvider;
+    @ElementDriver
+    private IElementDriver elementDriver;
     @Autowired
     private WebDriverProperties properties;
     @Reporter
@@ -82,6 +86,9 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementIsNotVisible(ILocatable element, long timeout, TemporalUnit unit) {
+        if (!elementDriver.isElementDisplayed(element, false)){
+            return;
+        }
         WebElement webElement = webElementProvider.findElement(element);
         performWait(ExpectedConditions.invisibilityOf(webElement), timeout, unit);
     }

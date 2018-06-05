@@ -16,11 +16,14 @@
 
 package com.github.mishaninss.aspects;
 
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
+import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import com.github.mishaninss.uidriver.webdriver.WebElementProvider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,8 @@ public class UiDriverAspects {
 
     @Autowired
     private WebElementProvider webElementProvider;
+    @WaitingDriver
+    private IWaitingDriver waitingDriver;
 
     @Pointcut("execution(* com.github.mishaninss.uidriver.interfaces.IElementDriver.* (..))" )
     public void pointcutIElementDriverCall() {
@@ -67,6 +72,11 @@ public class UiDriverAspects {
         } catch (StaleElementReferenceException ex){
             LOGGER.trace("StaleElementReferenceException", ex);
             webElementProvider.clearCache();
+            return joinPoint.proceed();
+        } catch (InvalidElementStateException ex){
+            LOGGER.trace("InvalidElementStateException", ex);
+            webElementProvider.clearCache();
+            waitingDriver.waitForPageUpdate();
             return joinPoint.proceed();
         }
     }

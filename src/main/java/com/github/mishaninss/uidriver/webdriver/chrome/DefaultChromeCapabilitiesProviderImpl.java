@@ -140,7 +140,7 @@ public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvi
         capabilities.merge(capabilitiesLoader.loadCapabilities(capabilitiesFile));
         capabilities.merge(capabilitiesLoader.loadEnvironmentProperties());
         capabilities.merge(capabilitiesLoader.loadEnvironmentProperties(CAPABILITIES_PROPERTY_PREFIX));
-        reporter.debug("Desired capabilities: " + capabilities);
+        reporter.debug("Loaded capabilities: " + capabilities);
         return capabilities;
     }
 }

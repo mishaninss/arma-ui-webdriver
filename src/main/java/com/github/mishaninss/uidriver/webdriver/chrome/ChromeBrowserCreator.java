@@ -18,6 +18,8 @@ package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.exceptions.FrameworkConfigurationException;
+import com.github.mishaninss.reporting.IReporter;
+import com.github.mishaninss.reporting.Reporter;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverCreator;
 import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
@@ -43,6 +45,8 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
     private ICapabilitiesProvider capabilitiesProvider;
     @Autowired
     private IChromeDriverServiceCreator chromeDriverServiceCreator;
+    @Reporter
+    private IReporter reporter;
 
     @Override
     public WebDriver createDriver(DesiredCapabilities desiredCapabilities) {
@@ -50,6 +54,7 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
 
         DesiredCapabilities capabilities = capabilitiesProvider.getCapabilities();
         capabilities.merge(desiredCapabilities);
+        reporter.debug("Final desired capabilities: " + capabilities);
 
         try {
             if (properties.driver().isRemote()) {
