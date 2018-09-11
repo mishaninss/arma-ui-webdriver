@@ -19,6 +19,7 @@ package com.github.mishaninss.uidriver.webdriver;
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.Arma;
 import com.github.mishaninss.uidriver.annotations.WaitingDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IPageDriver;
@@ -32,6 +33,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.function.BiConsumer;
 
 /**
  * Implementation of {@link IPageDriver} interface based on WebDriver engine
@@ -54,6 +57,15 @@ public class WdPageDriver implements IPageDriver {
     private IScreenshoter screenshoter;
     @Autowired
     private UrlUtils urlUtils;
+    @Autowired
+    private Arma arma;
+
+    private BiConsumer<String, Arma> postPageOpenMethod;
+
+    @Override
+    public void setPostPageOpenMethod(BiConsumer<String, Arma> postPageOpenMethod){
+        this.postPageOpenMethod = postPageOpenMethod;
+    }
 
     @Override
     public WdPageDriver goToUrl(String url){
@@ -68,6 +80,9 @@ public class WdPageDriver implements IPageDriver {
             if (!StringUtils.equalsAnyIgnoreCase(unexpectedAlertBehaviour, "accept", "dismiss")){
                 throw ex;
             }
+        }
+        if (postPageOpenMethod != null){
+            postPageOpenMethod.accept(url, arma);
         }
         return this;
     }

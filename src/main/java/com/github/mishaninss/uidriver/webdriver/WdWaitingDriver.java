@@ -249,7 +249,7 @@ public class WdWaitingDriver implements IWaitingDriver {
             "var docReady = window.document.readyState === 'complete';"
                     + "var hasJQuery = window.jQuery !== undefined;"
                     + "var isJqueryComplete = hasJQuery ? window.jQuery.active === 0 : true;"
-                    + "var isAnimatedComplete = hasJQuery ? window.jQuery(':animated').size() === 0 : true;"
+                    + "var isAnimatedComplete = hasJQuery ? window.jQuery(':animated').length === 0 : true;"
                     + "return docReady && isJqueryComplete && isAnimatedComplete;";
 
     /**
