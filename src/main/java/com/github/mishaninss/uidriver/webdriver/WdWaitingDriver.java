@@ -53,6 +53,24 @@ public class WdWaitingDriver implements IWaitingDriver {
     private IReporter reporter;
     private BiConsumer<Long, TemporalUnit> waitForPageUpdateMethod;
 
+    /**
+     * Use this method to specify Java Script to check if page is updated
+     * @param script - Java Script must return true, if page is updated or false otherwise
+     * @see WdWaitingDriver#JQUERY_COMPLETE
+     * @see WdWaitingDriver#ANGULAR_HTTP_COMPLETE
+     * @see WdWaitingDriver#DOC_READY_STATE_COMPLETE
+     */
+    @Override
+    public void setWaitForPageUpdateScript(String script) {
+        setWaitForPageUpdateMethod((timeout, unit) -> performWait(
+                (WebDriver webDriver) -> {
+                    Preconditions.checkArgument(webDriver != null);
+                    JavascriptExecutor js = (JavascriptExecutor) webDriver;
+                    Object result = js.executeScript(script);
+                    return result == null || Boolean.parseBoolean(result.toString());
+                }, timeout, unit));
+    }
+
     @Override
     public void setWaitForPageUpdateMethod(BiConsumer<Long, TemporalUnit> method) {
         waitForPageUpdateMethod = method;
@@ -86,7 +104,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     @Override
     public void waitForElementIsNotVisible(ILocatable element, long timeout, TemporalUnit unit) {
-        if (!elementDriver.isElementDisplayed(element, false)){
+        if (!elementDriver.isElementDisplayed(element, false)) {
             return;
         }
         WebElement webElement = webElementProvider.findElement(element);
@@ -192,9 +210,11 @@ public class WdWaitingDriver implements IWaitingDriver {
     private void detectWaitForPageUpdateMethod() {
         if (isJQuery()) {
             reporter.debug("jQuery detected");
-            waitForPageUpdateMethod =
-                    (timeout, unit) -> performWait(isJQueryCompleted, timeout, unit);
-            return;
+            if (checkWaitingScript(webDriverFactory.getDriver(), JQUERY_COMPLETE)) {
+                waitForPageUpdateMethod =
+                        (timeout, unit) -> performWait(isJQueryCompleted, timeout, unit);
+                return;
+            }
         }
 
         if (isAngular()) {
@@ -202,14 +222,16 @@ public class WdWaitingDriver implements IWaitingDriver {
             boolean angularHttpSupported = isAngularHttpSupported();
             if (angularHttpSupported) {
                 reporter.debug("Angular http waiter supported");
-                waitForPageUpdateMethod = (timeout, unit) -> {
-                    performWait(isAngularHttpCompleted, timeout, unit);
-                };
-                return;
+                if (checkWaitingScript(webDriverFactory.getDriver(), ANGULAR_HTTP_COMPLETE)) {
+                    waitForPageUpdateMethod =
+                            (timeout, unit) -> performWait(isAngularHttpCompleted, timeout, unit);
+                    return;
+                }
             }
         }
 
         reporter.debug("Using default page load waiter");
+
         waitForPageUpdateMethod = (timeout, unit) -> performWait(IS_DOC_READY_STATE_COMPLETED, timeout, unit);
     }
 
@@ -245,7 +267,7 @@ public class WdWaitingDriver implements IWaitingDriver {
     /**
      * JavaScript code to check if all the ajax requests completed
      */
-    private static final String JQUERY_COMPLETE =
+    public static final String JQUERY_COMPLETE =
             "var docReady = window.document.readyState === 'complete';"
                     + "var hasJQuery = window.jQuery !== undefined;"
                     + "var isJqueryComplete = hasJQuery ? window.jQuery.active === 0 : true;"
@@ -255,7 +277,7 @@ public class WdWaitingDriver implements IWaitingDriver {
     /**
      * JavaScript code to check if all the ajax requests completed
      */
-    private static final String ANGULAR_HTTP_COMPLETE =
+    public static final String ANGULAR_HTTP_COMPLETE =
             "var docReady = window.document.readyState === 'complete';"
                     + "var hasAngular = window.angular !== undefined;"
                     + "var isAngularCompleted = hasAngular ? window.angular.element(document).injector().get('$http').pendingRequests.length === 0 : true;"
@@ -265,7 +287,7 @@ public class WdWaitingDriver implements IWaitingDriver {
     /**
      * JavaScript code to check if all the ajax requests completed
      */
-    private static final String DOC_READY_STATE_COMPLETE = "return window.document.readyState === 'complete';";
+    public static final String DOC_READY_STATE_COMPLETE = "return window.document.readyState === 'complete';";
 
     private final ExpectedCondition<Object> isJQueryCompleted = (WebDriver webDriver) -> {
         Preconditions.checkArgument(webDriver != null);
@@ -287,4 +309,15 @@ public class WdWaitingDriver implements IWaitingDriver {
         Object result = js.executeScript(DOC_READY_STATE_COMPLETE);
         return result == null || Boolean.parseBoolean(result.toString());
     };
+
+    private boolean checkWaitingScript(WebDriver webDriver, String script) {
+        try {
+            JavascriptExecutor js = (JavascriptExecutor) webDriver;
+            js.executeScript(script);
+            return true;
+        } catch (Exception ex) {
+            reporter.warn("Provided waiting script [" + script + "] doesn't work", ex);
+            return false;
+        }
+    }
 }
