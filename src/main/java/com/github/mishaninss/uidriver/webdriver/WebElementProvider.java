@@ -39,23 +39,18 @@ public class WebElementProvider {
     @Autowired
     private IWebDriverFactory webDriverFactory;
 
-    /**  WebElements cache */
+    /**
+     * WebElements cache
+     */
     private final Map<ILocatable, WebElement> elements = new HashMap<>();
 
-    public void clearCache(){
+    public void clearCache() {
         elements.clear();
     }
 
-    public WebElement findElement(ILocatable element){
-        if (!element.useContextLookup()){
-            String locator = element.getLocator();
-            Object[] indexCheck = LocatorConverter.checkForIndex(locator);
-            WebElement webElement;
-            if (ArrayUtils.isEmpty(indexCheck)) {
-                webElement = findElement(null, locator);
-            } else {
-                webElement = findElement(null, indexCheck[1].toString(), (Integer) indexCheck[0]);
-            }
+    public WebElement findElement(ILocatable element) {
+        if (!element.useContextLookup()) {
+            WebElement webElement = checkIndexAndFindElement(null, element.getLocator());
             elements.put(element, webElement);
             return webElement;
         } else {
@@ -67,25 +62,26 @@ public class WebElementProvider {
                 ILocatable nextElement = elementsStack.pop();
                 webElement = cacheLookup(nextElement);
                 if (webElement == null) {
-                    String locator = nextElement.getLocator();
-                    Object[] indexCheck = LocatorConverter.checkForIndex(locator);
-                    if (ArrayUtils.isEmpty(indexCheck)) {
-                        webElement = findElement(contextElement, locator);
-                    } else {
-                        webElement = findElement(contextElement, indexCheck[1].toString(), (Integer) indexCheck[0]);
-                    }
+                    webElement = checkIndexAndFindElement(contextElement, nextElement.getLocator());
                     elements.put(nextElement, webElement);
                 }
                 contextElement = webElement;
             }
-            if (webElement == null){
+            if (webElement == null) {
                 throw new NoSuchElementException("Cannot find element " + StringUtils.join(element.getLocatorDeque(), " -> "));
             }
             return webElement;
         }
     }
 
-    private WebElement cacheLookup(ILocatable element){
+    private WebElement checkIndexAndFindElement(WebElement context, String locator) {
+        Object[] indexCheck = LocatorConverter.checkForIndex(locator);
+        return ArrayUtils.isEmpty(indexCheck) ?
+                findElement(context, locator) :
+                findElement(context, indexCheck[1].toString(), (Integer) indexCheck[0]);
+    }
+
+    private WebElement cacheLookup(ILocatable element) {
         return elements.get(element);
     }
 

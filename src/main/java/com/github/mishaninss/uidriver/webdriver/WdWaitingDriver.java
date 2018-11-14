@@ -19,11 +19,13 @@ package com.github.mishaninss.uidriver.webdriver;
 import com.github.mishaninss.data.WebDriverProperties;
 import com.github.mishaninss.reporting.IReporter;
 import com.github.mishaninss.reporting.Reporter;
+import com.github.mishaninss.uidriver.Arma;
 import com.github.mishaninss.uidriver.annotations.ElementDriver;
 import com.github.mishaninss.uidriver.interfaces.IElementDriver;
 import com.github.mishaninss.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,10 +39,13 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 @Component
 public class WdWaitingDriver implements IWaitingDriver {
 
+    @Autowired
+    private Arma arma;
     @Autowired
     protected IWebDriverFactory webDriverFactory;
     @Autowired
@@ -55,6 +60,7 @@ public class WdWaitingDriver implements IWaitingDriver {
 
     /**
      * Use this method to specify Java Script to check if page is updated
+     *
      * @param script - Java Script must return true, if page is updated or false otherwise
      * @see WdWaitingDriver#JQUERY_COMPLETE
      * @see WdWaitingDriver#ANGULAR_HTTP_COMPLETE
@@ -160,6 +166,24 @@ public class WdWaitingDriver implements IWaitingDriver {
     }
 
     @Override
+    public void waitForElementAttributeToBeNotEmpty(ILocatable element, String attribute) {
+        WebElement webElement = webElementProvider.findElement(element);
+        performWait(ExpectedConditions.attributeToBeNotEmpty(webElement, attribute), properties.driver().timeoutsElement, ChronoUnit.MILLIS);
+    }
+
+    @Override
+    public void waitForElementAttributeToBeNotEmpty(ILocatable element, String attribute, long timeoutInSeconds) {
+        WebElement webElement = webElementProvider.findElement(element);
+        performWait(ExpectedConditions.attributeToBeNotEmpty(webElement, attribute), timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    @Override
+    public void waitForElementAttributeToBeNotEmpty(ILocatable element, String attribute, long timeout, TemporalUnit unit) {
+        WebElement webElement = webElementProvider.findElement(element);
+        performWait(ExpectedConditions.attributeToBeNotEmpty(webElement, attribute), timeout, unit);
+    }
+
+    @Override
     public void waitForUrlToBe(String url) {
         waitForUrlToBe(url, properties.driver().timeoutsElement, ChronoUnit.MILLIS);
     }
@@ -187,6 +211,69 @@ public class WdWaitingDriver implements IWaitingDriver {
     @Override
     public void waitForAlertIsPresent(long timeout, TemporalUnit unit) {
         performWait(ExpectedConditions.alertIsPresent(), timeout, unit);
+    }
+
+    @Override
+    public void waitForElementAttributeToBe(ILocatable element, String attribute, String value) {
+        waitForElementAttributeToBe(element, attribute, value, properties.driver().timeoutsElement, ChronoUnit.MILLIS);
+    }
+
+    @Override
+    public void waitForElementAttributeToBe(ILocatable element, String attribute, String value, long timeoutInSeconds) {
+        waitForElementAttributeToBe(element, attribute, value, timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    @Override
+    public void waitForElementAttributeToBe(ILocatable element, String attribute, String value, long timeout, TemporalUnit unit) {
+        WebElement webElement = webElementProvider.findElement(element);
+        performWait(ExpectedConditions.attributeToBe(webElement, attribute, value), timeout, unit);
+    }
+
+    @Override
+    public void waitForElementAttributeContains(ILocatable element, String attribute, String value) {
+        waitForElementAttributeContains(element, attribute, value, properties.driver().timeoutsElement, ChronoUnit.MILLIS);
+    }
+
+    @Override
+    public void waitForElementAttributeContains(ILocatable element, String attribute, String value, long timeoutInSeconds) {
+        waitForElementAttributeContains(element, attribute, value, timeoutInSeconds, ChronoUnit.SECONDS);
+    }
+
+    @Override
+    public void waitForElementAttributeContains(ILocatable element, String attribute, String value, long timeout, TemporalUnit unit) {
+        WebElement webElement = webElementProvider.findElement(element);
+        performWait(ExpectedConditions.attributeContains(webElement, attribute, value), timeout, unit);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition) {
+        return waitForCondition(condition, null);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition, String message) {
+        return waitForCondition(condition, properties.driver().timeoutsElement, ChronoUnit.MILLIS, message);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition, long timeoutInSeconds) {
+        return waitForCondition(condition, timeoutInSeconds, ChronoUnit.SECONDS, null);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition, long timeoutInSeconds, String message) {
+        return waitForCondition(condition, timeoutInSeconds, ChronoUnit.SECONDS, message);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition, long timeout, TemporalUnit unit) {
+        return waitForCondition(condition, timeout, unit, null);
+    }
+
+    @Override
+    public <T> T waitForCondition(Supplier<T> condition, long timeout, TemporalUnit unit, String message) {
+        ExpectedCondition<T> ec = (WebDriver webdriver) -> condition.get();
+        return performWait((ec), timeout, unit, message);
     }
 
     @Override
@@ -258,10 +345,18 @@ public class WdWaitingDriver implements IWaitingDriver {
         }
     }
 
-    protected void performWait(ExpectedCondition<?> condition, long timeout, TemporalUnit unit) {
+    protected <T> T performWait(ExpectedCondition<T> condition, long timeout, TemporalUnit unit) {
+        return performWait(condition, timeout, unit, null);
+    }
+
+    protected <T> T performWait(ExpectedCondition<T> condition, long timeout, TemporalUnit unit, String message) {
         FluentWait<WebDriver> wait = new FluentWait<>(webDriverFactory.getDriver());
         Duration duration = Duration.of(timeout, unit);
-        wait.withTimeout(duration).until(condition);
+        wait.withTimeout(duration);
+        if (StringUtils.isNotBlank(message)){
+            wait.withMessage(message);
+        }
+        return wait.until(condition);
     }
 
     /**

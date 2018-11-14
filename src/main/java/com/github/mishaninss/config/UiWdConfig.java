@@ -16,12 +16,29 @@
 
 package com.github.mishaninss.config;
 
-import com.github.mishaninss.aspects.IElementWaitingDriverAspects;
 import com.github.mishaninss.aspects.SeleniumAspects;
 import com.github.mishaninss.aspects.UiDriverAspects;
-import com.github.mishaninss.uidriver.annotations.*;
-import com.github.mishaninss.uidriver.interfaces.*;
-import com.github.mishaninss.uidriver.webdriver.*;
+import com.github.mishaninss.uidriver.annotations.AlertHandler;
+import com.github.mishaninss.uidriver.annotations.BrowserDriver;
+import com.github.mishaninss.uidriver.annotations.ElementDriver;
+import com.github.mishaninss.uidriver.annotations.ElementsDriver;
+import com.github.mishaninss.uidriver.annotations.PageDriver;
+import com.github.mishaninss.uidriver.annotations.SelectElementDriver;
+import com.github.mishaninss.uidriver.annotations.WaitingDriver;
+import com.github.mishaninss.uidriver.interfaces.IAlertHandler;
+import com.github.mishaninss.uidriver.interfaces.IBrowserDriver;
+import com.github.mishaninss.uidriver.interfaces.IElementDriver;
+import com.github.mishaninss.uidriver.interfaces.IElementsDriver;
+import com.github.mishaninss.uidriver.interfaces.IPageDriver;
+import com.github.mishaninss.uidriver.interfaces.ISelectElementDriver;
+import com.github.mishaninss.uidriver.interfaces.IWaitingDriver;
+import com.github.mishaninss.uidriver.webdriver.WdAlertHandler;
+import com.github.mishaninss.uidriver.webdriver.WdBrowserDriver;
+import com.github.mishaninss.uidriver.webdriver.WdElementDriver;
+import com.github.mishaninss.uidriver.webdriver.WdElementsDriver;
+import com.github.mishaninss.uidriver.webdriver.WdPageDriver;
+import com.github.mishaninss.uidriver.webdriver.WdSelectElementDriver;
+import com.github.mishaninss.uidriver.webdriver.WdWaitingDriver;
 import org.aspectj.lang.Aspects;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
@@ -40,11 +57,6 @@ public class UiWdConfig {
     @Bean
     public UiDriverAspects uiDriverAspects() {
         return Aspects.aspectOf(UiDriverAspects.class);
-    }
-
-    @Bean
-    public IElementWaitingDriverAspects iElementWaitingDriverAspects() {
-        return Aspects.aspectOf(IElementWaitingDriverAspects.class);
     }
 
     @Bean(IWaitingDriver.QUALIFIER) @WaitingDriver

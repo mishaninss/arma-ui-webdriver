@@ -28,14 +28,13 @@ import org.openqa.selenium.logging.LogEntries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 
  * @author Sergey Mishanin
- *
  */
 @Component
 public class WdBrowserDriver implements IBrowserDriver {
@@ -83,6 +82,18 @@ public class WdBrowserDriver implements IBrowserDriver {
     }
 
     @Override
+    public void switchToWindow(int windowIndex) {
+        List<String> windowHandles = new ArrayList<>(getWindowHandles());
+        webDriverFactory.getDriver().switchTo().window(windowHandles.get(windowIndex));
+    }
+
+    @Override
+    public void switchToLastWindow() {
+        List<String> windowHandles = new ArrayList<>(getWindowHandles());
+        webDriverFactory.getDriver().switchTo().window(windowHandles.get(windowHandles.size() - 1));
+    }
+
+    @Override
     public void closeCurrentWindow() {
         webDriverFactory.getDriver().close();
     }
@@ -93,13 +104,13 @@ public class WdBrowserDriver implements IBrowserDriver {
     }
 
     @Override
-    public List<ILogEntry> getLogEntries(String logType){
+    public List<ILogEntry> getLogEntries(String logType) {
         LogEntries logEntries = webDriverFactory.getDriver().manage().logs().get(logType);
         return logEntries.getAll().stream().map(WdLogEntry::new).collect(Collectors.toList());
     }
 
     @Override
-    public boolean isBrowserStarted(){
+    public boolean isBrowserStarted() {
         return webDriverFactory.isBrowserStarted();
     }
 
@@ -107,7 +118,7 @@ public class WdBrowserDriver implements IBrowserDriver {
     @Override
     public void maximizeWindow() {
         WebDriver driver = webDriverFactory.getDriver();
-        if (StringUtils.isNoneBlank(properties.driver().screenResolution)){
+        if (StringUtils.isNoneBlank(properties.driver().screenResolution)) {
             driver.manage().window().setSize(webDriverFactory.getWindowDimension());
         } else {
             driver.manage().window().maximize();

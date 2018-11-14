@@ -28,9 +28,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * 
  * @author Sergey Mishanin
- *
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -40,7 +38,7 @@ public class WdThisElementDriver implements IThisElementDriver {
 
     private ILocatable element;
 
-    public WdThisElementDriver(ILocatable element){
+    public WdThisElementDriver(ILocatable element) {
         this.element = element;
     }
 
@@ -48,7 +46,7 @@ public class WdThisElementDriver implements IThisElementDriver {
      * Performs scrolling to make the element visible on screen
      */
     @Override
-    public IThisElementDriver scrollTo(){
+    public IThisElementDriver scrollTo() {
         elementDriver.scrollToElement(element);
         return this;
     }
@@ -65,32 +63,35 @@ public class WdThisElementDriver implements IThisElementDriver {
 
     /**
      * Checks if the element is displayed on the page or not.
+     *
      * @return true if the element exists on the page and displayed; false otherwise.
      */
     @Override
     @FiresEvent(ElementEvent.IS_DISPLAYED)
-    public boolean isDisplayed(){
+    public boolean isDisplayed() {
         return isDisplayed(true);
     }
 
     /**
      * Checks if the element is displayed on the page or not.
+     *
      * @param waitForElement - true if you want to wait for an element existence;
-     * false otherwise.
+     *                       false otherwise.
      * @return true if element exists on the page and displayed; false otherwise.
      */
     @Override
     @FiresEvent(ElementEvent.IS_DISPLAYED)
-    public boolean isDisplayed(boolean waitForElement){
+    public boolean isDisplayed(boolean waitForElement) {
         return elementDriver.isElementDisplayed(element, waitForElement);
     }
 
     /**
      * Checks if the element is enabled or not.
+     *
      * @return true if the element is enabled; false otherwise.
      */
     @Override
-    public boolean isEnabled(){
+    public boolean isEnabled() {
         return elementDriver.isElementEnabled(element);
     }
 
@@ -99,7 +100,7 @@ public class WdThisElementDriver implements IThisElementDriver {
      */
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public IThisElementDriver click(){
+    public IThisElementDriver click() {
         elementDriver.clickOnElement(element);
         return this;
     }
@@ -109,29 +110,31 @@ public class WdThisElementDriver implements IThisElementDriver {
      */
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public IThisElementDriver simpleClick(){
+    public IThisElementDriver simpleClick() {
         elementDriver.simpleClickOnElement(element);
         return this;
     }
 
     /**
      * Simulates left click with a pressed key (eg. CTRL, SHIFT, ALT)
+     *
      * @param key - pressed key
      */
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public IThisElementDriver clickWithKeyPressed(CharSequence key){
+    public IThisElementDriver clickWithKeyPressed(CharSequence key) {
         elementDriver.clickOnElementWithKeyPressed(element, key);
         return this;
     }
 
     /**
      * Simulates typing into an element
+     *
      * @param keysToSend - keys to send
      */
     @Override
     @FiresEvent(ElementEvent.CHANGE_VALUE)
-    public IThisElementDriver sendKeys(CharSequence... keysToSend){
+    public IThisElementDriver sendKeys(CharSequence... keysToSend) {
         elementDriver.sendKeysToElement(element, keysToSend);
         return this;
     }
@@ -141,36 +144,36 @@ public class WdThisElementDriver implements IThisElementDriver {
      */
     @Override
     @FiresEvent(ElementEvent.CHANGE_VALUE)
-    public IThisElementDriver clear(){
+    public IThisElementDriver clear() {
         elementDriver.clearElement(element);
         return this;
     }
 
     @Override
-    public byte[] takeScreenshot(){
+    public byte[] takeScreenshot() {
         return elementDriver.takeElementScreenshot(element);
     }
 
     @Override
-    public IThisElementDriver highlight(){
+    public IThisElementDriver highlight() {
         elementDriver.highlightElement(element);
         return this;
     }
 
     @Override
-    public IThisElementDriver unhighlight(){
+    public IThisElementDriver unhighlight() {
         elementDriver.unhighlightElement(element);
         return this;
     }
 
     @Override
-    public IThisElementDriver addDebugInfo(final String info, final String tooltip){
+    public IThisElementDriver addDebugInfo(final String info, final String tooltip) {
         elementDriver.addElementDebugInfo(element, info, tooltip);
         return this;
     }
 
     @Override
-    public IThisElementDriver removeDebugInfo(){
+    public IThisElementDriver removeDebugInfo() {
         elementDriver.removeElementDebugInfo();
         return this;
     }
@@ -196,20 +199,20 @@ public class WdThisElementDriver implements IThisElementDriver {
 
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public Object executeJs(String javaScript){
+    public Object executeJs(String javaScript) {
         return elementDriver.executeJsOnElement(javaScript, element);
     }
 
     @Override
     @FiresEvent(ElementEvent.ACTION)
-    public IThisElementDriver jsClick(){
+    public IThisElementDriver jsClick() {
         executeJs("arguments[0].click()");
         return this;
     }
 
     @Override
     @FiresEvent(ElementEvent.CHANGE_VALUE)
-    public IThisElementDriver setValue(String value){
+    public IThisElementDriver setValue(String value) {
         elementDriver.setValueToElement(element, value);
         return this;
     }
@@ -217,5 +220,18 @@ public class WdThisElementDriver implements IThisElementDriver {
     @Override
     public ILocatable getElement() {
         return element;
+    }
+
+    @Override
+    @FiresEvent(ElementEvent.CHANGE_VALUE)
+    public IThisElementDriver setAttribute(String attribute, String value) {
+        elementDriver.setAttributeOfElement(element, attribute, value);
+        return this;
+    }
+
+    @Override
+    public IThisElementDriver removeAttribute(String attribute) {
+        elementDriver.removeAttributeOfElement(element, attribute);
+        return this;
     }
 }
