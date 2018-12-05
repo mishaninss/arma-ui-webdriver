@@ -23,10 +23,12 @@ import com.github.mishaninss.reporting.Reporter;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverCreator;
 import com.github.mishaninss.uidriver.webdriver.NetworkConditions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Profile("chrome")
 public class ChromeBrowserCreator implements IWebDriverCreator {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String COULD_NOT_START_SESSION_MESSAGE = "Could not start a new browser session";
 
     @Autowired
@@ -49,12 +52,12 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
     private IReporter reporter;
 
     @Override
-    public WebDriver createDriver(DesiredCapabilities desiredCapabilities) {
+    public WebDriver createDriver(Capabilities desiredCapabilities) {
         WebDriver webDriver;
 
-        DesiredCapabilities capabilities = capabilitiesProvider.getCapabilities();
+        Capabilities capabilities = capabilitiesProvider.getCapabilities();
         capabilities.merge(desiredCapabilities);
-        reporter.debug("Final desired capabilities: " + capabilities);
+        reporter.debug("Final desired capabilities: {}", GSON.toJson(capabilities));
 
         try {
             if (properties.driver().isRemote()) {

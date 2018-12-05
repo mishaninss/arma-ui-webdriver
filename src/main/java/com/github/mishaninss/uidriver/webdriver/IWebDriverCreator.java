@@ -16,10 +16,10 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 @FunctionalInterface
 public interface IWebDriverCreator {
-    WebDriver createDriver(DesiredCapabilities desiredCapabilities);
+    WebDriver createDriver(Capabilities desiredCapabilities);
 }

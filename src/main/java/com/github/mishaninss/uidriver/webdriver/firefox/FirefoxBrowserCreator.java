@@ -21,10 +21,10 @@ import com.github.mishaninss.exceptions.FrameworkConfigurationException;
 import com.github.mishaninss.uidriver.webdriver.ICapabilitiesProvider;
 import com.github.mishaninss.uidriver.webdriver.IWebDriverCreator;
 import io.github.bonigarcia.wdm.FirefoxDriverManager;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -44,10 +44,10 @@ public class FirefoxBrowserCreator implements IWebDriverCreator {
     private ICapabilitiesProvider capabilitiesProvider;
 
     @Override
-    public WebDriver createDriver(DesiredCapabilities desiredCapabilities) {
+    public WebDriver createDriver(Capabilities desiredCapabilities) {
         WebDriver webDriver;
 
-        DesiredCapabilities capabilities = desiredCapabilities != null ? desiredCapabilities : capabilitiesProvider.getCapabilities();
+        Capabilities capabilities = desiredCapabilities != null ? desiredCapabilities : capabilitiesProvider.getCapabilities();
         try {
             if (properties.driver().isRemote()) {
                 String gridUrl = properties.driver().gridUrl;

@@ -16,8 +16,8 @@
 
 package com.github.mishaninss.uidriver.webdriver;
 
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.Capabilities;
 
 public interface ICapabilitiesProvider {
-    DesiredCapabilities getCapabilities();
+    Capabilities getCapabilities();
 }
