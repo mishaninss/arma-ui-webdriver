@@ -17,14 +17,17 @@
 package com.github.mishaninss.uidriver.webdriver.chrome;
 
 import com.github.mishaninss.uidriver.webdriver.WebDriverFactory;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
  * Provides a single instance of WebDriver
- * @author Sergey Mishanin
  *
+ * @author Sergey Mishanin
  */
 @Component
 @Profile("chrome")
@@ -37,8 +40,20 @@ public class ChromeDriverFactory extends WebDriverFactory {
      * nulls WebDriver instance
      */
     @Override
-    public void hardCloseDriver(){
+    public void hardCloseDriver() {
         super.hardCloseDriver();
         chromeDriverServiceCreator.terminateChrome();
+    }
+
+    @Override
+    public String getSessionId() {
+        if (!isBrowserStarted()) {
+            return null;
+        }
+        SessionId sessionId = driver instanceof RemoteWebDriver ?
+                ((RemoteWebDriver) driver).getSessionId() :
+                ((ChromeDriver) driver).getSessionId();
+
+        return sessionId.toString();
     }
 }

@@ -29,6 +29,7 @@ public interface IWebDriverFactory {
     /**
      * Provides an instance of WebDriver. Creates this instance if it has not
      * been created yet, or returns an existed one otherwise.
+     *
      * @return an instance of WebDriver
      */
     WebDriver getDriver();
@@ -57,6 +58,7 @@ public interface IWebDriverFactory {
 
     /**
      * Sets implicitly waiting timeout for the current WebDriver.
+     *
      * @param timeout - timeout in milliseconds
      */
     void setWaitingTimeout(int timeout);
@@ -66,4 +68,6 @@ public interface IWebDriverFactory {
     Dimension getWindowDimension();
 
     void setDesiredCapabilities(DesiredCapabilities capabilities);
+
+    String getSessionId();
 }
