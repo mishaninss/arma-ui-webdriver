@@ -25,6 +25,8 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
@@ -48,7 +50,8 @@ public class WebElementProvider {
         elements.clear();
     }
 
-    public WebElement findElement(ILocatable element) {
+    public @NonNull
+    WebElement findElement(ILocatable element) {
         if (!element.useContextLookup()) {
             WebElement webElement = checkIndexAndFindElement(null, element.getLocator());
             elements.put(element, webElement);
@@ -81,11 +84,13 @@ public class WebElementProvider {
                 findElement(context, indexCheck[1].toString(), (Integer) indexCheck[0]);
     }
 
-    private WebElement cacheLookup(ILocatable element) {
+    private @Nullable
+    WebElement cacheLookup(ILocatable element) {
         return elements.get(element);
     }
 
-    private WebElement findElement(WebElement context, String locator) {
+    private @NonNull
+    WebElement findElement(@Nullable WebElement context, @NonNull String locator) {
         WebDriver driver = webDriverFactory.getDriver();
         if (context == null) {
             LOGGER.trace("find element {}", locator);
@@ -96,7 +101,8 @@ public class WebElementProvider {
         }
     }
 
-    private WebElement findElement(WebElement context, String locator, int index) {
+    private @NonNull
+    WebElement findElement(@Nullable WebElement context, @NonNull String locator, int index) {
         WebDriver driver = webDriverFactory.getDriver();
         List<WebElement> webElements;
         if (context == null) {

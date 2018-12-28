@@ -38,12 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.mishaninss.utils.Keys.*;
+import static com.github.mishaninss.utils.Keys.CONTROL;
 
 /**
- * 
  * @author Sergey Mishanin
- *
  */
 @Component
 public class WdElementsDriver implements IElementsDriver {
@@ -59,23 +57,23 @@ public class WdElementsDriver implements IElementsDriver {
     private WebElementProvider webElementProvider;
 
     @Override
-    public boolean areElementsDisplayed(String locator){
+    public boolean areElementsDisplayed(String locator) {
         return areElementsDisplayed(locator, false);
     }
-    
+
     @Override
-    public boolean areElementsDisplayed(String locator, boolean waitForElement){
-        if (!waitForElement){
+    public boolean areElementsDisplayed(String locator, boolean waitForElement) {
+        if (!waitForElement) {
             webDriverFactory.setWaitingTimeout(0);
         }
-        try{
+        try {
             List<WebElement> elements = findElements(locator);
-            for (WebElement element: elements){
-                if (!element.isDisplayed()){
+            for (WebElement element : elements) {
+                if (!element.isDisplayed()) {
                     return false;
                 }
             }
-        } catch (NoSuchElementException ex){
+        } catch (NoSuchElementException ex) {
             reporter.ignoredException(ex);
             return false;
         } finally {
@@ -83,105 +81,105 @@ public class WdElementsDriver implements IElementsDriver {
         }
         return true;
     }
-    
+
     @Override
-    public boolean areElementsEnabled(String locator){
+    public boolean areElementsEnabled(String locator) {
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
-            if (!element.isEnabled()){
+        for (WebElement element : elements) {
+            if (!element.isEnabled()) {
                 return false;
             }
         }
         return true;
     }
-    
+
     @Override
-    public boolean areElementsSelected(String locator){
+    public boolean areElementsSelected(String locator) {
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
-            if (!element.isSelected()){
+        for (WebElement element : elements) {
+            if (!element.isSelected()) {
                 return false;
             }
         }
         return true;
     }
-    
+
     @Override
-    public String[] getAttributeOfElements(String locator, String attribute){
+    public String[] getAttributeOfElements(String locator, String attribute) {
         List<WebElement> elements = findElements(locator);
         String[] attributes = new String[elements.size()];
-        for (int i = 0; i<elements.size(); i++){
+        for (int i = 0; i < elements.size(); i++) {
             attributes[i] = elements.get(i).getAttribute(attribute);
         }
         return attributes;
     }
-    
+
     @Override
-    public WdElementsDriver clickOnElements(String locator){
+    public WdElementsDriver clickOnElements(String locator) {
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
+        for (WebElement element : elements) {
             waitForElementToBeClickable(element);
             element.click();
         }
         return this;
     }
-    
+
     @Override
-    public WdElementsDriver clickOnElementsWithKeyPressed(String locator, CharSequence key){
+    public WdElementsDriver clickOnElementsWithKeyPressed(String locator, CharSequence key) {
         WebDriver driver = webDriverFactory.getDriver();
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
+        for (WebElement element : elements) {
             waitForElementToBeClickable(element);
             Actions actions = new Actions(driver);
             actions.keyDown(CONTROL).click(element).keyUp(CONTROL).perform();
         }
         return this;
     }
-    
+
     @Override
-    public String[] getTextFromElements(String locator){
+    public String[] getTextFromElements(String locator) {
         List<WebElement> elements = findElements(locator);
         String[] texts = new String[elements.size()];
-        for (int i = 0; i<elements.size(); i++){
+        for (int i = 0; i < elements.size(); i++) {
             texts[i] = elements.get(i).getText();
         }
         return texts;
     }
-    
+
     @Override
-    public String[] getFullTextFromElements(String locator){
+    public String[] getFullTextFromElements(String locator) {
         return getAttributeOfElements(locator, "textContent");
     }
-    
+
     @Override
-    public WdElementsDriver sendKeysToElements(String locator, CharSequence... keysToSend){
+    public WdElementsDriver sendKeysToElements(String locator, CharSequence... keysToSend) {
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
+        for (WebElement element : elements) {
             element.sendKeys(keysToSend);
         }
         return this;
     }
-    
+
     @Override
-    public WdElementsDriver clearElements(String locator){
+    public WdElementsDriver clearElements(String locator) {
         List<WebElement> elements = findElements(locator);
-        for (WebElement element: elements){
+        for (WebElement element : elements) {
             element.clear();
         }
         return this;
     }
-    
-	private void waitForElementToBeClickable(WebElement element){
+
+    private void waitForElementToBeClickable(WebElement element) {
         waitForElementToBeClickable(element, properties.driver().timeoutsElement);
     }
-	
-	private void waitForElementToBeClickable(WebElement element, int timeout){
-	    WebDriver driver = webDriverFactory.getDriver();
-	    new WebDriverWait(driver, TimeUnit.MILLISECONDS.toSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
+
+    private void waitForElementToBeClickable(WebElement element, int timeout) {
+        WebDriver driver = webDriverFactory.getDriver();
+        new WebDriverWait(driver, TimeUnit.MILLISECONDS.toSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
     }
 
-    private List<WebElement> findElements(ILocatable element){
-        if (!element.useContextLookup()){
+    private List<WebElement> findElements(ILocatable element) {
+        if (!element.useContextLookup()) {
             return findElements(null, element.getLocator());
         } else {
             WebElement contextWebElement = null;
@@ -204,7 +202,7 @@ public class WdElementsDriver implements IElementsDriver {
         }
     }
 
-    private List<WebElement> findElements(String locator){
+    private List<WebElement> findElements(String locator) {
         WebDriver driver = webDriverFactory.getDriver();
         return driver.findElements(LocatorConverter.toBy(locator));
     }
@@ -226,7 +224,7 @@ public class WdElementsDriver implements IElementsDriver {
         Map<String, String> imgs = new HashMap<>();
         for (int i = 0; i < images.size(); i++) {
             WebElement img = images.get(i);
-            String imgLocator = "(" + locator + ")[" + (i+1) + "]";
+            String imgLocator = "(" + locator + ")[" + (i + 1) + "]";
             imgs.put(imgLocator, img.getAttribute("src"));
         }
         return imgs;

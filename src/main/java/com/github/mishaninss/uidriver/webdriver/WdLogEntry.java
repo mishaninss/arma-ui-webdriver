@@ -34,7 +34,7 @@ public class WdLogEntry implements ILogEntry {
     /**
      * @param level     the severity of the log entry
      * @param timestamp UNIX Epoch timestamp at which this log entry was created
-     * @param message ew  the log entry's message
+     * @param message   ew  the log entry's message
      */
     public WdLogEntry(Level level, long timestamp, String message) {
         this.level = level;
@@ -42,7 +42,7 @@ public class WdLogEntry implements ILogEntry {
         this.message = message;
     }
 
-    public WdLogEntry(LogEntry seleniumLogEntry){
+    public WdLogEntry(LogEntry seleniumLogEntry) {
         this(seleniumLogEntry.getLevel(), seleniumLogEntry.getTimestamp(), seleniumLogEntry.getMessage());
     }
 

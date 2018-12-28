@@ -29,6 +29,7 @@ import io.github.bonigarcia.wdm.ChromeDriverManager;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,7 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
 
     @Override
     public WebDriver createDriver(Capabilities desiredCapabilities) {
-        WebDriver webDriver;
+        ExtendedChromeDriver webDriver;
 
         Capabilities capabilities = capabilitiesProvider.getCapabilities();
         capabilities.merge(desiredCapabilities);
@@ -63,20 +64,21 @@ public class ChromeBrowserCreator implements IWebDriverCreator {
             if (properties.driver().isRemote()) {
                 String gridUrl = properties.driver().gridUrl;
                 webDriver = new ExtendedChromeDriver(new URL(gridUrl), capabilities);
+                webDriver.setFileDetector(new LocalFileDetector());
             } else {
                 ChromeDriverManager.getInstance().setup();
                 ChromeDriverService chromeDriverService = chromeDriverServiceCreator.getChromeDriverService();
-                if (!chromeDriverService.isRunning()){
+                if (!chromeDriverService.isRunning()) {
                     chromeDriverService.start();
                 }
                 webDriver = new ExtendedChromeDriver(chromeDriverService, capabilities);
             }
             NetworkConditions networkConditions = properties.driver().getNetworkConditions();
             if (networkConditions != null) {
-                ((ExtendedChromeDriver) webDriver).setNetworkConditions(networkConditions);
+                webDriver.setNetworkConditions(networkConditions);
             }
-        } catch (Exception ex){
-            throw new FrameworkConfigurationException(COULD_NOT_START_SESSION_MESSAGE ,ex);
+        } catch (Exception ex) {
+            throw new FrameworkConfigurationException(COULD_NOT_START_SESSION_MESSAGE, ex);
         }
 
         webDriver.manage().timeouts().implicitlyWait(properties.driver().timeoutsElement, TimeUnit.MILLISECONDS);

@@ -41,7 +41,7 @@ public class WdDefaultScreenshoter implements IScreenshoter {
     public byte[] takeScreenshot() {
         try {
             return takeScreenshotAs(IOutputType.BYTES);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             reporter.debug("Could not take a screenshot", ex);
             return new byte[0];
         }
@@ -51,19 +51,19 @@ public class WdDefaultScreenshoter implements IScreenshoter {
     @SuppressWarnings("unchecked")
     public <X> X takeScreenshotAs(IOutputType<X> outputType) {
         Class<?> clazz = outputType.getMyType();
-        if (String.class.equals(clazz)){
+        if (String.class.equals(clazz)) {
             return (X) takeScreenshot(OutputType.BASE64);
         }
-        if (byte[].class.equals(clazz)){
+        if (byte[].class.equals(clazz)) {
             return (X) takeScreenshot(OutputType.BYTES);
         }
-        if (File.class.equals(clazz)){
+        if (File.class.equals(clazz)) {
             return (X) takeScreenshot(OutputType.FILE);
         }
         throw new IllegalArgumentException("Unsupported format of output type " + clazz);
     }
 
-    protected <X> X takeScreenshot(OutputType<X> seleniumOutputType){
+    protected <X> X takeScreenshot(OutputType<X> seleniumOutputType) {
         return ((TakesScreenshot) webDriverFactory.getDriver()).getScreenshotAs(seleniumOutputType);
     }
 }

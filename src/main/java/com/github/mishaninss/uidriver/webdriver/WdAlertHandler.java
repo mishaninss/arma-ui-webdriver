@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Implementation of {@link IAlertHandler} interface based on WebDriver engine
  * Provides methods to interact with alert popups.
+ *
  * @author Sergey Mishanin
  */
 @Component
@@ -40,32 +41,32 @@ public class WdAlertHandler implements IAlertHandler {
     @WaitingDriver
     private IWaitingDriver waitingDriver;
 
-	@Override
-	public boolean isDisplayed(){
-	    return isDisplayed(false);
+    @Override
+    public boolean isDisplayed() {
+        return isDisplayed(false);
     }
 
     @Override
-    public boolean isDisplayed(boolean waitForAlert){
-        try{
-            if (waitForAlert){
+    public boolean isDisplayed(boolean waitForAlert) {
+        try {
+            if (waitForAlert) {
                 waitingDriver.waitForAlertIsPresent();
             }
             return true;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             reporter.ignoredException(ex);
             return false;
         }
     }
 
-	@Override
-	public void accept(){
+    @Override
+    public void accept() {
         Alert alert = getAlert();
         reporter.info("Accept alert [{}]", getText());
         alert.accept();
-	}
+    }
 
-	@Override
+    @Override
     public void dismiss() {
         Alert alert = getAlert();
         reporter.info("Dismiss alert [{}]", getText());
@@ -80,12 +81,12 @@ public class WdAlertHandler implements IAlertHandler {
         return this;
     }
 
-	@Override
-    public String getText(){
+    @Override
+    public String getText() {
         return getAlert().getText();
     }
 
-    private Alert getAlert(){
+    private Alert getAlert() {
         WebDriver driver = webDriverFactory.getDriver();
         waitingDriver.waitForAlertIsPresent();
         return driver.switchTo().alert();

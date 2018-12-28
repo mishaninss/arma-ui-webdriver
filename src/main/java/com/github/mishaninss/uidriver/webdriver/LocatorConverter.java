@@ -27,7 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Util class for locators handling. 
+ * @author Sergey Mishanin
+ * Util class for locators handling.
  */
 public final class LocatorConverter {
     /**
@@ -51,7 +52,7 @@ public final class LocatorConverter {
     }
 
     public static Object[] checkForIndex(String locator) {
-        if (StringUtils.isBlank(locator)){
+        if (StringUtils.isBlank(locator)) {
             return new Object[0];
         }
         Pattern p = Pattern.compile(INDEXED_LOCATOR_PATTERN);
@@ -72,44 +73,45 @@ public final class LocatorConverter {
         return StringUtils.countMatches(locator, "%");
     }
 
-    public static By toBy(final WebElement webElement){
+    public static By toBy(final WebElement webElement) {
         String stringWebElement = webElement.toString();
         String[] tokens = stringWebElement.split("->");
         String locator = tokens[1];
         locator = StringUtils.stripEnd(locator.replaceFirst(":", "="), "]").trim();
         return toBy(locator);
     }
-    /** 
+
+    /**
      * Converts locator to "location technique" for WebDriver API
+     *
      * @param locator - locator to be converted
      * @return locator as By
      */
     public static By toBy(final String locator) {
-        if(locator == null) {
+        if (locator == null) {
             throw new IllegalArgumentException();
         }
 
         String locatorValue = locator.trim();
-        if(locatorValue.length() == 0) {
+        if (locatorValue.length() == 0) {
             throw new IllegalArgumentException();
         }
 
         String locatorType = null;
         Matcher matcher = PATTERN.matcher(locatorValue);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             int index = 0;
             locatorType = matcher.group(++index);
-            if(locatorType != null) {
+            if (locatorType != null) {
                 locatorType = locatorType.toLowerCase();
                 locatorValue = matcher.group(++index);
-            }
-            else {
+            } else {
                 locatorType = detectImplicitType(locatorValue);
             }
         }
 
         ByFor locatorConverter = CONVERTERS.get(locatorType);
-        if(locatorConverter == null) {
+        if (locatorConverter == null) {
             String errorMessage = String.format(UNKNOWN_TYPE, locator);
             throw new IllegalArgumentException(errorMessage);
         }
@@ -117,7 +119,7 @@ public final class LocatorConverter {
         return locatorConverter.toBy(locatorValue);
     }
 
-    /** 
+    /**
      * Determines type of locator by its value.
      * Uses the following strategy:
      * <ul>
@@ -125,142 +127,150 @@ public final class LocatorConverter {
      * <li>xpath, for locators starting with "//" or "(//"</li>
      * <li>identifier, otherwise</li>
      * </ul>
+     *
      * @param locatorValue - locator value without explicit type
      */
-    private static String detectImplicitType(final String locatorValue)
-    {
+    private static String detectImplicitType(final String locatorValue) {
         String implicitType = "";
-        if(locatorValue.startsWith("./") ||locatorValue.startsWith("//") || locatorValue.startsWith("(//") || locatorValue.startsWith("(./"))
-        {
+        if (locatorValue.startsWith("./") || locatorValue.startsWith("//") || locatorValue.startsWith("(//") || locatorValue.startsWith("(./")) {
             implicitType = LocatorType.XPATH;
         }
         return implicitType;
     }
-    
-    /** Converter from locator value to location technique for WebDriver API */
-    private interface ByFor
-    {
-        /** 
+
+    /**
+     * Converter from locator value to location technique for WebDriver API
+     */
+    private interface ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         By toBy(final String locatorValue);
     }
 
-    /** Converter for type "id" */
-    private static class ByForId implements ByFor
-    {
-        /** 
+    /**
+     * Converter for type "id"
+     */
+    private static class ByForId implements ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.id(locatorValue);
         }
     }
 
-    /** Converter for type "name" */
-    private static class ByForName implements ByFor
-    {
-        /** 
+    /**
+     * Converter for type "name"
+     */
+    private static class ByForName implements ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.name(locatorValue);
         }
     }
 
-    /** Converter for type "xpath" */
-    private static class ByForXPath implements ByFor
-    {
-        /** 
+    /**
+     * Converter for type "xpath"
+     */
+    private static class ByForXPath implements ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.xpath(locatorValue);
         }
     }
 
-    /** Converter for type "link" */
-    private static class ByForLinkText implements ByFor
-    {
-        /** 
+    /**
+     * Converter for type "link"
+     */
+    private static class ByForLinkText implements ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.linkText(locatorValue);
         }
     }
 
-    /** Converter for type "partialLink" */
-    private static class ByForPartialLinkText implements ByFor
-    {
+    /**
+     * Converter for type "partialLink"
+     */
+    private static class ByForPartialLinkText implements ByFor {
         /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.partialLinkText(locatorValue);
         }
     }
 
-    /** Converter for type "link" */
-    private static class ByForTagName implements ByFor
-    {
+    /**
+     * Converter for type "link"
+     */
+    private static class ByForTagName implements ByFor {
         /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.tagName(locatorValue);
         }
     }
 
-    /** Converter for type "class" */
-    private static class ByForClassName implements ByFor
-    {
+    /**
+     * Converter for type "class"
+     */
+    private static class ByForClassName implements ByFor {
         /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.className(locatorValue);
         }
     }
 
-    /** Converter for type "css" */
-    private static class ByForCSS implements ByFor
-    {
-        /** 
+    /**
+     * Converter for type "css"
+     */
+    private static class ByForCSS implements ByFor {
+        /**
          * Converts locator value to "location technique" for WebDriver API
+         *
          * @param locatorValue - locator value without explicit type
          */
         @Override
-        public By toBy(final String locatorValue)
-        {
+        public By toBy(final String locatorValue) {
             return By.cssSelector(locatorValue);
         }
     }
 
-    static
-    {
+    static {
         PATTERN = Pattern.compile("(?:([a-zA-Z]+)\\s*=\\s*)?(.+)");
 
         CONVERTERS = new HashMap<>();

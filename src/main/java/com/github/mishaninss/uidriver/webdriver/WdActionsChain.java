@@ -45,28 +45,28 @@ public class WdActionsChain implements IActionsChain {
     private IReporter reporter;
     @Autowired
     private IWebDriverFactory webDriverFactory;
-    
+
     private Actions actions;
     private StringBuilder logEntry;
 
-    public WdActionsChain(){
+    public WdActionsChain() {
         logEntry = new StringBuilder("Perform actions chain");
     }
 
     @PostConstruct
-    private void init(){
+    private void init() {
         actions = new Actions(webDriverFactory.getDriver());
     }
 
-    private void addActionLog(String actionLog){
+    private void addActionLog(String actionLog) {
         logEntry
-            .append("\n").append(actionLog);
+                .append("\n").append(actionLog);
     }
 
-    private void addActionLog(String actionLog, Object... args){
-        for (int i=0; i<args.length; i++){
+    private void addActionLog(String actionLog, Object... args) {
+        for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
-            if (arg instanceof ILocatable){
+            if (arg instanceof ILocatable) {
                 args[i] = INamed.getLoggableNameIfApplicable(arg);
             }
         }

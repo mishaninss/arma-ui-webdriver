@@ -27,9 +27,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 
  * @author Sergey Mishanin
- *
  */
 @Component
 public class WdSelectElementDriver implements ISelectElementDriver {
@@ -38,53 +36,53 @@ public class WdSelectElementDriver implements ISelectElementDriver {
     @Autowired
     IWebDriverFactory webDriverFactory;
 
-    private Select findSelectElement(String locator){
+    private Select findSelectElement(String locator) {
         WebDriver driver = webDriverFactory.getDriver();
         WebElement element = driver.findElement(LocatorConverter.toBy(locator));
         return new Select(element);
     }
 
-    private Select findSelectElement(ILocatable element){
+    private Select findSelectElement(ILocatable element) {
         return new Select(webElementProvider.findElement(element));
     }
-   
+
     @Override
-    public WdSelectElementDriver selectByValue(String locator, String value){
-        Select select = findSelectElement(locator); 
+    public WdSelectElementDriver selectByValue(String locator, String value) {
+        Select select = findSelectElement(locator);
         select.selectByValue(value);
         return this;
     }
 
     @Override
-    public WdSelectElementDriver selectByValue(ILocatable element, String value){
+    public WdSelectElementDriver selectByValue(ILocatable element, String value) {
         Select select = findSelectElement(element);
         select.selectByValue(value);
         return this;
     }
-    
+
     @Override
-    public WdSelectElementDriver selectByVisibleText(String locator, String text){
-        Select select = findSelectElement(locator); 
+    public WdSelectElementDriver selectByVisibleText(String locator, String text) {
+        Select select = findSelectElement(locator);
         select.selectByVisibleText(text);
         return this;
     }
 
     @Override
-    public WdSelectElementDriver selectByVisibleText(ILocatable element, String text){
+    public WdSelectElementDriver selectByVisibleText(ILocatable element, String text) {
         Select select = findSelectElement(element);
         select.selectByVisibleText(text);
         return this;
     }
-    
+
     @Override
-    public WdSelectElementDriver selectByIndex(String locator, int index){
-        Select select = findSelectElement(locator); 
+    public WdSelectElementDriver selectByIndex(String locator, int index) {
+        Select select = findSelectElement(locator);
         select.selectByIndex(index);
         return this;
     }
 
     @Override
-    public WdSelectElementDriver selectByIndex(ILocatable element, int index){
+    public WdSelectElementDriver selectByIndex(ILocatable element, int index) {
         Select select = findSelectElement(element);
         select.selectByIndex(index);
         return this;
@@ -138,17 +136,17 @@ public class WdSelectElementDriver implements ISelectElementDriver {
         List<WebElement> options = select.getOptions();
         return getOptionsText(options);
     }
-    
-    private String getOptionText(WebElement element){
+
+    private String getOptionText(WebElement element) {
         return element.getText();
     }
-    
-    private String[] getOptionsText(List<WebElement> options){
+
+    private String[] getOptionsText(List<WebElement> options) {
         String[] optionsText = new String[options.size()];
-        for (int i=0; i<options.size(); i++){
+        for (int i = 0; i < options.size(); i++) {
             optionsText[i] = getOptionText(options.get(i));
         }
         return optionsText;
     }
-    
+
 }

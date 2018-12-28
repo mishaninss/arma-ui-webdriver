@@ -33,7 +33,7 @@ public class ChromeScreenshoter extends WdDefaultScreenshoter {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected  <X> X takeScreenshot(OutputType<X> seleniumOutputType) {
+    protected <X> X takeScreenshot(OutputType<X> seleniumOutputType) {
         try {
             if (OutputType.BASE64.equals(seleniumOutputType)) {
                 return (X) chromeExtender.takeScreenshotAsString();
@@ -44,7 +44,7 @@ public class ChromeScreenshoter extends WdDefaultScreenshoter {
             } else {
                 return null;
             }
-        } catch (IOException ex){
+        } catch (IOException ex) {
             return null;
         }
     }

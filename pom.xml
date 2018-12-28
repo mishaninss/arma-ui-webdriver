@@ -59,7 +59,7 @@
     </repositories>
 
     <properties>
-        <selenium.version>3.11.0</selenium.version>
+        <selenium.version>3.141.59</selenium.version>
         <aspectj.version>1.9.1</aspectj.version>
         <arma.ui.commons.version>1.0-SNAPSHOT</arma.ui.commons.version>
     </properties>

@@ -36,17 +36,17 @@ public class WdElementActionsChain implements IElementActionsChain {
     @Autowired
     IActionsChain actionsChain;
 
-    public WdElementActionsChain(ILocatable element){
+    public WdElementActionsChain(ILocatable element) {
         this.element = element;
     }
 
-    public WdElementActionsChain(ILocatable element, boolean autoperform){
+    public WdElementActionsChain(ILocatable element, boolean autoperform) {
         this.element = element;
         this.autoperform = autoperform;
     }
 
-    private void autoperform(){
-        if (autoperform){
+    private void autoperform() {
+        if (autoperform) {
             perform();
         }
     }

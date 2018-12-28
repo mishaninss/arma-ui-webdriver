@@ -39,6 +39,7 @@ import java.util.function.BiConsumer;
 /**
  * Implementation of {@link IPageDriver} interface based on WebDriver engine
  * Provides methods to interact with a page in browser.
+ *
  * @author Sergey Mishanin
  */
 @Component
@@ -63,95 +64,95 @@ public class WdPageDriver implements IPageDriver {
     private BiConsumer<String, Arma> postPageOpenMethod;
 
     @Override
-    public void setPostPageOpenMethod(BiConsumer<String, Arma> postPageOpenMethod){
+    public void setPostPageOpenMethod(BiConsumer<String, Arma> postPageOpenMethod) {
         this.postPageOpenMethod = postPageOpenMethod;
     }
 
     @Override
-    public WdPageDriver goToUrl(String url){
+    public WdPageDriver goToUrl(String url) {
         String resolvedUrl = urlUtils.resolveUrl(url);
         reporter.info("Open URL " + resolvedUrl);
         WebDriver driver = webDriverFactory.getDriver();
         driver.get(resolvedUrl);
         try {
             waitingDriver.waitForPageUpdate();
-        } catch (UnhandledAlertException ex){
+        } catch (UnhandledAlertException ex) {
             String unexpectedAlertBehaviour = properties.driver().unexpectedAlertBehaviour;
-            if (!StringUtils.equalsAnyIgnoreCase(unexpectedAlertBehaviour, "accept", "dismiss")){
+            if (!StringUtils.equalsAnyIgnoreCase(unexpectedAlertBehaviour, "accept", "dismiss")) {
                 throw ex;
             }
         }
-        if (postPageOpenMethod != null){
+        if (postPageOpenMethod != null) {
             postPageOpenMethod.accept(url, arma);
         }
         return this;
     }
 
-	@Override
-	public WdPageDriver refreshPage(){
+    @Override
+    public WdPageDriver refreshPage() {
         webDriverFactory.getDriver().navigate().refresh();
         return this;
     }
 
     @Override
-    public WdPageDriver navigateBack(){
+    public WdPageDriver navigateBack() {
         webDriverFactory.getDriver().navigate().back();
         return this;
     }
 
     @Override
-    public Object executeAsyncJS(String javaScript){
+    public Object executeAsyncJS(String javaScript) {
         WebDriver driver = webDriverFactory.getDriver();
-        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript);
+        return ((JavascriptExecutor) driver).executeAsyncScript(javaScript);
     }
 
     @Override
-    public Object executeAsyncJS(String javaScript, Object... args){
+    public Object executeAsyncJS(String javaScript, Object... args) {
         WebDriver driver = webDriverFactory.getDriver();
-        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript, args);
+        return ((JavascriptExecutor) driver).executeAsyncScript(javaScript, args);
     }
 
     @Override
-    public Object executeAsyncJS(String javaScript, ILocatable element, Object... args){
+    public Object executeAsyncJS(String javaScript, ILocatable element, Object... args) {
         WebDriver driver = webDriverFactory.getDriver();
         WebElement webElement = webElementProvider.findElement(element);
-        return ((JavascriptExecutor)driver).executeAsyncScript(javaScript, webElement, args);
+        return ((JavascriptExecutor) driver).executeAsyncScript(javaScript, webElement, args);
     }
 
     @Override
-    public Object executeJS(String javaScript){
+    public Object executeJS(String javaScript) {
         WebDriver driver = webDriverFactory.getDriver();
-        return ((JavascriptExecutor)driver).executeScript(javaScript);
+        return ((JavascriptExecutor) driver).executeScript(javaScript);
     }
 
-	@Override
-    public Object executeJS(String javaScript, String locator, Object... args){
+    @Override
+    public Object executeJS(String javaScript, String locator, Object... args) {
         WebDriver driver = webDriverFactory.getDriver();
         WebElement webElement = driver.findElement(LocatorConverter.toBy(locator));
-        return ((JavascriptExecutor)driver).executeScript(javaScript, webElement, args);
+        return ((JavascriptExecutor) driver).executeScript(javaScript, webElement, args);
     }
 
-	@Override
-	public String getCurrentUrl(){
-	    WebDriver driver = webDriverFactory.getDriver();
-	    String url =  driver.getCurrentUrl();
-	    reporter.debug("Current URL {}", url);
-	    return url;
-	}
-
-	@Override
-	public String getPageTitle(){
-	    WebDriver driver = webDriverFactory.getDriver();
-	    return driver.getTitle();
-	}
+    @Override
+    public String getCurrentUrl() {
+        WebDriver driver = webDriverFactory.getDriver();
+        String url = driver.getCurrentUrl();
+        reporter.debug("Current URL {}", url);
+        return url;
+    }
 
     @Override
-    public byte[] takeScreenshot(){
+    public String getPageTitle() {
+        WebDriver driver = webDriverFactory.getDriver();
+        return driver.getTitle();
+    }
+
+    @Override
+    public byte[] takeScreenshot() {
         return screenshoter.takeScreenshot();
     }
 
     @Override
-    public boolean scrollToBottom(){
+    public boolean scrollToBottom() {
         try {
             int innerHeight = Integer.parseInt(executeJS("return document.body.scrollHeight").toString());
             int positionBefore;
@@ -163,7 +164,7 @@ public class WdPageDriver implements IPageDriver {
                 positionAfter = Integer.parseInt(executeJS("return window.pageYOffset;").toString());
             } while (positionAfter - positionBefore > 0);
             return true;
-        } catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             return false;
         }
     }

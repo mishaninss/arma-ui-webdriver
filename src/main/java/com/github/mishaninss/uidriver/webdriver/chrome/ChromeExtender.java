@@ -49,7 +49,7 @@ public class ChromeExtender {
 
     public byte[] takeScreenshot() throws IOException {
         String image = takeScreenshotAsString();
-        if (image == null){
+        if (image == null) {
             return new byte[0];
         } else {
             return Base64.getDecoder().decode(image);
@@ -84,7 +84,7 @@ public class ChromeExtender {
     public File takeScreenshotAsFile() throws IOException {
         String screenshotsDir = properties.framework().screenshotsDir;
         File dir = new File(screenshotsDir);
-        if (!dir.exists()){
+        if (!dir.exists()) {
             FileUtils.forceMkdir(dir);
         }
         String fileName = "Screenshot_" + new Date().getTime();
@@ -110,10 +110,10 @@ public class ChromeExtender {
         Response response = driver.getCommandExecutor().execute(xc);
 
         Object value = response.getValue();
-        if(response.getStatus() == null || response.getStatus() != 0) {
+        if (response.getStatus() == null || response.getStatus() != 0) {
             throw new WebDriverException("Command '" + cmd + "' failed: " + value);
         }
-        if(null == value)
+        if (null == value)
             throw new WebDriverException("Null response value to command '" + cmd + "'");
         return value;
     }
@@ -123,10 +123,10 @@ public class ChromeExtender {
     private static <T> T jsonValue(@Nonnull Object map, @Nonnull String path, @Nonnull Class<T> type) {
         String[] segs = path.split("\\.");
         Object current = map;
-        for(String name: segs) {
+        for (String name : segs) {
             Map<String, Object> cm = (Map<String, Object>) current;
             Object o = cm.get(name);
-            if(null == o)
+            if (null == o)
                 return null;
             current = o;
         }

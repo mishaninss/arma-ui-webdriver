@@ -32,6 +32,8 @@ import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -53,75 +55,81 @@ public class DesiredCapabilitiesLoader {
     @Autowired
     private Environment environment;
 
-    public Capabilities loadCapabilities(){
+    public Capabilities loadCapabilities() {
         return loadCapabilities(defaultCapabilitiesFile, DesiredCapabilities.class);
     }
 
-    public Capabilities loadCapabilities(String capabilitiesFilePath, Class<? extends MutableCapabilities> capabilitiesClass){
-        if (StringUtils.isBlank(capabilitiesFilePath)){
+    public @NonNull
+    Capabilities loadCapabilities(@Nullable String capabilitiesFilePath, @NonNull Class<? extends MutableCapabilities> capabilitiesClass) {
+        if (StringUtils.isBlank(capabilitiesFilePath)) {
             reporter.debug("Provided blank desired capabilities file path");
-            return null;
+            return new DesiredCapabilities();
         }
 
         File capabilitiesFile = getCapabilitiesFile(capabilitiesFilePath);
-        if (capabilitiesFile == null || !capabilitiesFile.exists()){
+        if (capabilitiesFile == null || !capabilitiesFile.exists()) {
             reporter.debug("Could not resolve desired capabilities file path [" + capabilitiesFilePath + "]");
-            return null;
+            return new DesiredCapabilities();
         }
 
         String format = FilenameUtils.getExtension(capabilitiesFilePath).toLowerCase();
-        switch (format){
-            case "properties": return loadPropertiesFile(capabilitiesFile, capabilitiesClass);
-            case "json": return loadJsonFile(capabilitiesFile, capabilitiesClass);
-            default: reporter.warn("Unknown desired capabilities file format [{}]. Supported formats: .properties, .json", format);
+        switch (format) {
+            case "properties":
+                return loadPropertiesFile(capabilitiesFile, capabilitiesClass);
+            case "json":
+                return loadJsonFile(capabilitiesFile, capabilitiesClass);
+            default:
+                reporter.warn("Unknown desired capabilities file format [{}]. Supported formats: .properties, .json", format);
         }
-        return null;
+        return new DesiredCapabilities();
     }
 
-    private File getCapabilitiesFile(String capabilitiesFilePath){
+    private @NonNull
+    File getCapabilitiesFile(@NonNull String capabilitiesFilePath) {
         URL resource = DesiredCapabilities.class.getResource(capabilitiesFilePath);
-        if (resource != null){
+        if (resource != null) {
             return FileUtils.toFile(resource);
         } else {
             return new File(capabilitiesFilePath);
         }
     }
 
-    public Capabilities loadPropertiesFile(File capabilitiesFile, Class<? extends MutableCapabilities> capabilitiesClass){
+    public @NonNull
+    Capabilities loadPropertiesFile(@NonNull File capabilitiesFile, Class<? extends MutableCapabilities> capabilitiesClass) {
         try {
             Properties props = new Properties();
             MutableCapabilities capabilities = capabilitiesClass.newInstance();
             props.load(new FileInputStream(capabilitiesFile));
             props.forEach((key, value) -> capabilities.setCapability(key.toString(), value));
-            reporter.debug("Desired capabilities loaded from file [{}]: {}", capabilitiesFile,  GSON.toJson(capabilities.asMap()));
+            reporter.debug("Desired capabilities loaded from file [{}]: {}", capabilitiesFile, GSON.toJson(capabilities.asMap()));
             return capabilities;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             reporter.debug("Could not load desired capabilities from file [" + capabilitiesFile + "]", ex);
-            return null;
+            return new DesiredCapabilities();
         }
     }
 
-    public Capabilities loadJsonFile(File capabilitiesFile, Class<? extends Capabilities> capabilitiesClass){
+    public Capabilities loadJsonFile(File capabilitiesFile, Class<? extends Capabilities> capabilitiesClass) {
         try {
             String json = FileUtils.readFileToString(capabilitiesFile, "UTF-8");
             Capabilities capabilities = GSON.fromJson(json, capabilitiesClass);
             reporter.debug("Desired capabilities loaded from file [{}]: {}", capabilitiesFile, GSON.toJson(capabilities.asMap()));
             return capabilities;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             reporter.debug("Could not load desired capabilities from file [" + capabilitiesFile + "]", ex);
             return null;
         }
     }
 
-    public Capabilities loadEnvironmentProperties(){
+    public Capabilities loadEnvironmentProperties() {
         return loadEnvironmentProperties(CAPABILITIES_PROPERTY_PREFIX, DesiredCapabilities.class);
     }
 
-    public Capabilities loadEnvironmentProperties(Class<? extends MutableCapabilities> capabilitiesClass){
+    public Capabilities loadEnvironmentProperties(Class<? extends MutableCapabilities> capabilitiesClass) {
         return loadEnvironmentProperties(CAPABILITIES_PROPERTY_PREFIX, capabilitiesClass);
     }
 
-    public Capabilities loadEnvironmentProperties(String prefix, Class<? extends MutableCapabilities> capabilitiesClass){
+    public Capabilities loadEnvironmentProperties(String prefix, Class<? extends MutableCapabilities> capabilitiesClass) {
         try {
             MutableCapabilities capabilities = capabilitiesClass.newInstance();
             MutablePropertySources propSrcs = ((AbstractEnvironment) environment).getPropertySources();
@@ -137,7 +145,7 @@ public class DesiredCapabilitiesLoader {
                     );
             reporter.debug("Desired capabilities loaded from Environment properties with prefix [{}] : {}", prefix, GSON.toJson(capabilities.asMap()));
             return capabilities;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             reporter.debug("Could not load desired capabilities from file with prefix[" + prefix + "]", ex);
             return null;
         }

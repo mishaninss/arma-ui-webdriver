@@ -27,7 +27,7 @@ public class WdPoint implements IPoint {
         this.seleniumPoint = seleniumPoint;
     }
 
-    public WdPoint(int x, int y){
+    public WdPoint(int x, int y) {
         this.seleniumPoint = new Point(x, y);
     }
 
@@ -51,7 +51,7 @@ public class WdPoint implements IPoint {
         seleniumPoint.move(newX, newY);
     }
 
-    public Point toSeleniumPoint(){
+    public Point toSeleniumPoint() {
         return seleniumPoint;
     }
 }
