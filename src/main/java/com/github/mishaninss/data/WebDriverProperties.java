@@ -71,7 +71,6 @@ public class WebDriverProperties {
         public static final String NETWORK_CONDITIONS = "arma.driver.network.conditions";
         public static final String UNEXPECTED_ALERT_BEHAVIOUR = "arma.driver.unexpected.alert.behaviour";
         public static final String COLLECT_NETWORK_LOGS = "arma.driver.collect.network.logs";
-        public static final String DOWNLOADS_DIR = "arma.driver.downloads.dir";
 
         @Value("${" + COLLECT_NETWORK_LOGS + ":false}")
         public boolean collectNetworkLogs;
@@ -105,9 +104,6 @@ public class WebDriverProperties {
 
         @Value("${" + UNEXPECTED_ALERT_BEHAVIOUR + ":}")
         public String unexpectedAlertBehaviour;
-
-        @Value("${" + DOWNLOADS_DIR + ":}")
-        public String downloadsDir;
 
         public boolean shouldCollectPerfLogs(){
             return collectTracingLogs || collectNetworkLogs;
