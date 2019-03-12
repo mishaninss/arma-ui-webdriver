@@ -186,7 +186,7 @@ public class WdElementsDriver implements IElementsDriver {
             Deque<ILocatable> contextDeque = element.getRealLocatableObjectDeque();
             contextDeque.pollLast();
             if (!contextDeque.isEmpty()) {
-                ILocatable context = contextDeque.poll();
+                ILocatable context = contextDeque.pollLast();
                 contextWebElement = webElementProvider.findElement(context);
             }
             return findElements(contextWebElement, element.getLocator());
