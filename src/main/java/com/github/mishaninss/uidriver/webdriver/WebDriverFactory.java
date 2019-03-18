@@ -33,6 +33,7 @@ import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -95,6 +96,11 @@ public class WebDriverFactory implements IWebDriverFactory {
     public void switchToSession(String sessionName) {
         currentSessionName = sessionName;
         driver = namedDrivers.get(sessionName);
+    }
+
+    @Override
+    public Set<String> getAvailableSessions(){
+        return new HashSet<>(namedDrivers.keySet());
     }
 
     @Override

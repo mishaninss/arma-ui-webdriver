@@ -20,6 +20,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.util.Set;
+
 /**
  * Created by Sergey_Mishanin
  */
@@ -35,6 +37,8 @@ public interface IWebDriverFactory {
     WebDriver getDriver();
 
     void switchToSession(String sessionName);
+
+    Set<String> getAvailableSessions();
 
     void switchToDefaultSession();
 
