@@ -294,6 +294,26 @@ public class WdWaitingDriver implements IWaitingDriver {
         waitForPageUpdateMethod.accept(timeout, unit);
     }
 
+    @Override
+    public <T> T executeWithoutWaiting(Supplier<T> supplier){
+        webDriverFactory.setWaitingTimeout(0);
+        try {
+            return supplier.get();
+        } finally {
+            webDriverFactory.restoreWaitingTimeout();
+        }
+    }
+
+    @Override
+    public void executeWithoutWaiting(Runnable runnable){
+        webDriverFactory.setWaitingTimeout(0);
+        try {
+            runnable.run();
+        } finally {
+            webDriverFactory.restoreWaitingTimeout();
+        }
+    }
+
     private void detectWaitForPageUpdateMethod() {
         if (isJQuery()) {
             reporter.debug("jQuery detected");
