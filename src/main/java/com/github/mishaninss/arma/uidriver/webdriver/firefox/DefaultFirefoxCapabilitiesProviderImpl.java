@@ -18,46 +18,41 @@ package com.github.mishaninss.arma.uidriver.webdriver.firefox;
 
 import com.github.mishaninss.arma.data.WebDriverProperties;
 import com.github.mishaninss.arma.uidriver.webdriver.ICapabilitiesProvider;
-import org.openqa.selenium.UnexpectedAlertBehaviour;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import java.util.logging.Level;
+import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.util.logging.Level;
 
 @Component
 @Profile("firefox")
 public class DefaultFirefoxCapabilitiesProviderImpl implements ICapabilitiesProvider {
 
-    @Autowired
-    private WebDriverProperties properties;
+  @Autowired
+  private WebDriverProperties properties;
 
-    private DesiredCapabilities getFirefoxCapabilities(){
-        FirefoxProfile profile = new FirefoxProfile();
-        profile.setPreference("browser.startup.homepage", properties.application().url);
-        profile.setPreference("plugin.state.npdeployjava", 0);
-        profile.setAcceptUntrustedCertificates(true);
-        profile.setPreference("security.enable_java", true);
+  private MutableCapabilities getFirefoxCapabilities() {
+    FirefoxOptions profile = new FirefoxOptions();
+    profile.setCapability("browser.startup.homepage", properties.application().url);
+    profile.setCapability("plugin.state.npdeployjava", 0);
+    profile.setAcceptInsecureCerts(true);
+    profile.setCapability("security.enable_java", true);
 
-        DesiredCapabilities caps = DesiredCapabilities.firefox();
-        caps.setCapability(FirefoxDriver.PROFILE, profile);
+    LoggingPreferences loggingprefs = new LoggingPreferences();
+    loggingprefs.enable(LogType.BROWSER, Level.ALL);
 
-        LoggingPreferences loggingprefs = new LoggingPreferences();
-        loggingprefs.enable(LogType.BROWSER, Level.ALL);
-        caps.setCapability(CapabilityType.LOGGING_PREFS, loggingprefs);
-        caps.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR,  UnexpectedAlertBehaviour.ACCEPT);
+    return profile;
+  }
 
-        return caps;
-    }
+  private MutableCapabilities getChromeCapabilities() {
+    return getFirefoxCapabilities();
+  }
 
-    @Override
-    public DesiredCapabilities getCapabilities() {
-        return getFirefoxCapabilities();
-    }
+  @Override
+  public MutableCapabilities getCapabilities() {
+    return getFirefoxCapabilities();
+  }
 }

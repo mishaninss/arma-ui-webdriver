@@ -16,6 +16,8 @@
 
 package com.github.mishaninss.arma.uidriver.webdriver;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -177,7 +179,7 @@ public class WdElementsDriver implements IElementsDriver {
 
     private void waitForElementToBeClickable(WebElement element, int timeout) {
         WebDriver driver = webDriverFactory.getDriver();
-        new WebDriverWait(driver, TimeUnit.MILLISECONDS.toSeconds(timeout)).until(ExpectedConditions.elementToBeClickable(element));
+        new WebDriverWait(driver, Duration.of(timeout, ChronoUnit.MILLIS)).until(ExpectedConditions.elementToBeClickable(element));
     }
 
     private List<WebElement> findElements(ILocatable element) {

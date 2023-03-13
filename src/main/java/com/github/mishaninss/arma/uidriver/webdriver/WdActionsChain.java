@@ -39,16 +39,16 @@ import java.util.Arrays;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class WdActionsChain implements IActionsChain, InitializingBean {
     @Autowired
-    private WebElementProvider webElementProvider;
+    protected WebElementProvider webElementProvider;
     @WaitingDriver
-    private IWaitingDriver waitingDriver;
+    protected IWaitingDriver waitingDriver;
     @Reporter
-    private IReporter reporter;
+    protected IReporter reporter;
     @Autowired
-    private IWebDriverFactory webDriverFactory;
+    protected IWebDriverFactory webDriverFactory;
 
-    private Actions actions;
-    private final StringBuilder logEntry;
+    protected Actions actions;
+    protected final StringBuilder logEntry;
 
     public WdActionsChain() {
         logEntry = new StringBuilder("Perform actions chain");
@@ -59,12 +59,12 @@ public class WdActionsChain implements IActionsChain, InitializingBean {
         actions = new Actions(webDriverFactory.getDriver());
     }
 
-    private void addActionLog(String actionLog) {
+    protected void addActionLog(String actionLog) {
         logEntry
                 .append("\n").append(actionLog);
     }
 
-    private void addActionLog(String actionLog, Object... args) {
+    protected void addActionLog(String actionLog, Object... args) {
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
             if (arg instanceof ILocatable) {

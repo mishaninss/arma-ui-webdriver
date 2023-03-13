@@ -4,10 +4,10 @@ description = """"""
 
 dependencies {
     api group: 'com.github.mishaninss', name: 'arma-ui-commons', version: "${armaVersion}"
-    api(group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59') {
+    api(group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.2.2') {
         exclude module: 'guava'
     }
-    api(group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '4.3.1') {
+    api(group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '5.2.0') {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'com.google.code.gson', module: 'gson'
         exclude group: 'org.slf4j', module: 'slf4j-api'

@@ -6,6 +6,7 @@ import com.github.mishaninss.arma.reporting.Reporter;
 import com.github.mishaninss.arma.uidriver.interfaces.IDownloadsManager;
 import com.github.mishaninss.arma.uidriver.webdriver.DesiredCapabilitiesLoader;
 import com.github.mishaninss.arma.uidriver.webdriver.ICapabilitiesProvider;
+import com.github.mishaninss.arma.utils.FileUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
@@ -44,7 +44,7 @@ public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvi
   private static final String DEFAULT_CHROME_CAPABILITIES_FILE = "./chrome_capabilities.properties";
   @Value("${" + CAPABILITIES_FILE_PROPERTY + ":" + DEFAULT_CHROME_CAPABILITIES_FILE + "}")
   public String capabilitiesFile;
-  @Value("#{'${" + EXTENSION_FILES_PROPERTY + ":}'.split(',')}")
+  @Value("${" + EXTENSION_FILES_PROPERTY + ":}")
   private List<String> extensions;
 
   @Autowired
@@ -58,6 +58,7 @@ public class DefaultChromeCapabilitiesProviderImpl implements ICapabilitiesProvi
 
   private ChromeOptions getChromeOptions() {
     var chromeOptions = new ChromeOptions();
+    chromeOptions.setAcceptInsecureCerts(true);
     chromeOptions.addArguments(
         "disable-blink-features=BlockCredentialedSubresources",
         "disable-infobars",

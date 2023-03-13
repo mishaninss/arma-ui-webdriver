@@ -60,6 +60,9 @@ public class WdElementDriver implements IElementDriver {
   protected WebElementProvider webElementProvider;
   @Autowired
   protected ApplicationContext applicationContext;
+  @Autowired
+  @Lazy
+  protected IActionsChain actionsChain;
 
   /**
    * Performs scrolling to make the element visible on screen
@@ -448,5 +451,34 @@ public class WdElementDriver implements IElementDriver {
   public Dimension getSize(ILocatable element) {
     org.openqa.selenium.Dimension dim = webElementProvider.findElement(element).getSize();
     return new Dimension(dim.getWidth(), dim.getHeight());
+  }
+
+  @Override
+  public void setInputFile(ILocatable iLocatable, String s) {
+    sendKeysToElement(iLocatable, s);
+  }
+
+  @Override
+  public void clickOutsideOfElement(ILocatable locatable) {
+    IPoint point = getLocation(locatable);
+    Dimension dimension = getSize(locatable);
+    Dimension viewportSize = pageDriver.getViewportSize();
+    int x = point.getX() + dimension.getWidth() / 2;
+    int y = point.getY() + dimension.getHeight() / 2;
+    if (point.getX() > 10) {
+      x = -1 * (dimension.getWidth() / 2 + 10);
+    } else if (point.getX() + dimension.getWidth() + 10 < viewportSize.getWidth()) {
+      x = dimension.getWidth() / 2 + 10;
+    }
+    if (point.getY() > 10) {
+      y = -1 * (dimension.getHeight() / 2 + 10);
+    } else if (point.getY() + dimension.getHeight() + 10 < viewportSize.getHeight()) {
+      y = dimension.getHeight() / 2 + 10;
+    }
+    actionsChain
+        .moveToElement(locatable)
+        .moveByOffset(x, y)
+        .click()
+        .perform();
   }
 }

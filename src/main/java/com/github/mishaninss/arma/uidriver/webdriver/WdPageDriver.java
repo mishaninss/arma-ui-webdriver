@@ -9,6 +9,7 @@ import com.github.mishaninss.arma.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.arma.uidriver.interfaces.IPageDriver;
 import com.github.mishaninss.arma.uidriver.interfaces.IScreenshoter;
 import com.github.mishaninss.arma.uidriver.interfaces.IWaitingDriver;
+import com.github.mishaninss.arma.utils.Dimension;
 import com.github.mishaninss.arma.utils.UrlUtils;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -203,5 +204,12 @@ public class WdPageDriver implements IPageDriver {
   public WdPageDriver scrollToTop() {
     executeJS("window.scrollTo(0,0);");
     return this;
+  }
+
+  @Override
+  public Dimension getViewportSize() {
+    int width = Integer.parseInt(executeJS("return window.innerWidth").toString());
+    int height = Integer.parseInt(executeJS("return window.innerHeight").toString());
+    return new Dimension(width, height);
   }
 }

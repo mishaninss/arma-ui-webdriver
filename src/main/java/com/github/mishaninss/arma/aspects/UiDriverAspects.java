@@ -20,6 +20,7 @@ import com.github.mishaninss.arma.uidriver.WindowsManager;
 import com.github.mishaninss.arma.uidriver.interfaces.ILocatable;
 import com.github.mishaninss.arma.uidriver.interfaces.IWaitingDriver;
 import com.github.mishaninss.arma.uidriver.webdriver.WebElementProvider;
+import com.github.mishaninss.arma.utils.GenericUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -29,6 +30,7 @@ import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,12 +93,24 @@ public class UiDriverAspects {
     } catch (InvalidElementStateException ex) {
       LOGGER.trace("InvalidElementStateException", ex);
       applicationContext.getBean(WebElementProvider.class).clearCache();
-      applicationContext.getBean(IWaitingDriver.QUALIFIER, IWaitingDriver.class).waitForPageUpdate();
+      applicationContext.getBean(IWaitingDriver.QUALIFIER, IWaitingDriver.class)
+          .waitForPageUpdate();
       return joinPoint.proceed();
     } catch (TimeoutException ex) {
       if (StringUtils.contains(ex.getMessage(), "Timed out receiving message from renderer")) {
         LOGGER.trace("TimeoutException", ex);
         return null;
+      } else {
+        throw ex;
+      }
+    } catch (WebDriverException ex) {
+      if (StringUtils.contains(ex.getMessage(), "Could not find node with given id")) {
+        LOGGER.debug("WebDriverException", ex);
+        applicationContext.getBean(WebElementProvider.class).clearCache();
+        GenericUtils.pause(1);
+        applicationContext.getBean(IWaitingDriver.QUALIFIER, IWaitingDriver.class)
+            .waitForPageUpdate();
+        return joinPoint.proceed();
       } else {
         throw ex;
       }
