@@ -13,8 +13,10 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -57,13 +59,12 @@ public class WdWaitingDriver implements IWaitingDriver {
    */
   @Override
   public void setWaitForPageUpdateScript(String script) {
-    setWaitForPageUpdateMethod((timeout, unit) -> performWait(
-        (WebDriver webDriver) -> {
-          Preconditions.checkArgument(webDriver != null);
-          JavascriptExecutor js = (JavascriptExecutor) webDriver;
-          Object result = js.executeScript(script);
-          return result == null || Boolean.parseBoolean(result.toString());
-        }, timeout, unit));
+    setWaitForPageUpdateMethod((timeout, unit) -> performWait((WebDriver webDriver) -> {
+      Preconditions.checkArgument(webDriver != null);
+      JavascriptExecutor js = (JavascriptExecutor) webDriver;
+      Object result = js.executeScript(script);
+      return result == null || Boolean.parseBoolean(result.toString());
+    }, timeout, unit));
   }
 
   @Override
@@ -83,8 +84,8 @@ public class WdWaitingDriver implements IWaitingDriver {
 
   @Override
   public void waitForElementIsVisible(ILocatable element, long timeout, TemporalUnit unit) {
-    WebElement webElement = webElementProvider
-        .findElement(element, Duration.of(timeout, unit).toMillis());
+    WebElement webElement = webElementProvider.findElement(element,
+        Duration.of(timeout, unit).toMillis());
     performWait(ExpectedConditions.visibilityOf(webElement), timeout, unit);
   }
 
@@ -109,12 +110,30 @@ public class WdWaitingDriver implements IWaitingDriver {
   }
 
   @Override
+  public void waitForElementIsNotVisible(ILocatable element, String message) {
+    waitForElementIsNotVisible(element, properties.driver().timeoutsElement, ChronoUnit.MILLIS,
+        message);
+  }
+
+  @Override
   public void waitForElementIsNotVisible(ILocatable element, long timeoutInSeconds) {
     waitForElementIsNotVisible(element, timeoutInSeconds, ChronoUnit.SECONDS);
   }
 
   @Override
+  public void waitForElementIsNotVisible(ILocatable element, long timeoutInSeconds,
+      String message) {
+    waitForElementIsNotVisible(element, timeoutInSeconds, ChronoUnit.SECONDS, message);
+  }
+
+  @Override
   public void waitForElementIsNotVisible(ILocatable element, long timeout, TemporalUnit unit) {
+    waitForElementIsNotVisible(element, timeout, unit, null);
+  }
+
+  @Override
+  public void waitForElementIsNotVisible(ILocatable element, long timeout, TemporalUnit unit,
+      String message) {
     WebElement webElement = executeWithoutWaiting(() -> {
       try {
         return webElementProvider.findElement(element);
@@ -123,7 +142,7 @@ public class WdWaitingDriver implements IWaitingDriver {
       }
     });
     if (webElement != null) {
-      performWait(ExpectedConditions.invisibilityOf(webElement), timeout, unit);
+      performWait(ExpectedConditions.invisibilityOf(webElement), timeout, unit, message);
     }
   }
 
@@ -384,9 +403,8 @@ public class WdWaitingDriver implements IWaitingDriver {
     if (isJQuery()) {
       reporter.debug("jQuery detected");
       if (checkWaitingScript(webDriverFactory.getDriver(), JQUERY_COMPLETE)) {
-        waitForPageUpdateMethod =
-            (timeout, unit) -> performWait(isJQueryCompleted, timeout, unit,
-                String.format(WAIT_FOR_PAGE_UPDATE_MSG, timeout, unit));
+        waitForPageUpdateMethod = (timeout, unit) -> performWait(isJQueryCompleted, timeout, unit,
+            String.format(WAIT_FOR_PAGE_UPDATE_MSG, timeout, unit));
         return;
       }
     }
@@ -397,9 +415,8 @@ public class WdWaitingDriver implements IWaitingDriver {
       if (angularHttpSupported) {
         reporter.debug("Angular http waiter supported");
         if (checkWaitingScript(webDriverFactory.getDriver(), ANGULAR_HTTP_COMPLETE)) {
-          waitForPageUpdateMethod =
-              (timeout, unit) -> performWait(isAngularHttpCompleted, timeout, unit,
-                  String.format(WAIT_FOR_PAGE_UPDATE_MSG, timeout, unit));
+          waitForPageUpdateMethod = (timeout, unit) -> performWait(isAngularHttpCompleted, timeout,
+              unit, String.format(WAIT_FOR_PAGE_UPDATE_MSG, timeout, unit));
           return;
         }
       }
@@ -458,8 +475,8 @@ public class WdWaitingDriver implements IWaitingDriver {
       String message) {
     Duration duration = Duration.of(timeout, unit);
     long timeoutInMillis = duration.toMillis();
-    if (properties.driver().timeoutsDriverOperation > 0 && timeoutInMillis >= properties
-        .driver().timeoutsDriverOperation) {
+    if (properties.driver().timeoutsDriverOperation > 0
+        && timeoutInMillis >= properties.driver().timeoutsDriverOperation) {
       return splitWait(condition, timeoutInMillis, message);
     } else {
       FluentWait<WebDriver> wait = new FluentWait<>(webDriverFactory.getDriver());

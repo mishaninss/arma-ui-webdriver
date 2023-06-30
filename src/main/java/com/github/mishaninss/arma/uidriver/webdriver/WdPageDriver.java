@@ -138,7 +138,7 @@ public class WdPageDriver implements IPageDriver {
   public String getCurrentUrl() {
     WebDriver driver = webDriverFactory.getDriver();
     String url = driver.getCurrentUrl();
-    reporter.debug("Текущий URL {}", url);
+    reporter.debug("Текущий URL %s", url);
     return url;
   }
 

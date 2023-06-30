@@ -74,6 +74,13 @@ public class WdElementWaitingDriver implements IElementWaitingDriver {
   }
 
   @Override
+  public void isNotVisible(String msg) {
+    String message = String.format("Ожидаем исчезновения элемента %s", elementName);
+    reporter.info(message);
+    waitingDriver.waitForElementIsNotVisible(element, msg);
+  }
+
+  @Override
   public void isNotVisible(long timeoutInSeconds) {
     String message = String.format("Ожидаем исчезновения элемента %s", elementName);
     reporter.info(message);
@@ -81,10 +88,24 @@ public class WdElementWaitingDriver implements IElementWaitingDriver {
   }
 
   @Override
+  public void isNotVisible(long timeoutInSeconds, String msg) {
+    String message = String.format("Ожидаем исчезновения элемента %s", elementName);
+    reporter.info(message);
+    waitingDriver.waitForElementIsNotVisible(element, timeoutInSeconds, msg);
+  }
+
+  @Override
   public void isNotVisible(long timeout, TemporalUnit unit) {
     String message = String.format("Ожидаем исчезновения элемента %s", elementName);
     reporter.info(message);
     waitingDriver.waitForElementIsNotVisible(element, timeout, unit);
+  }
+
+  @Override
+  public void isNotVisible(long timeout, TemporalUnit unit, String msg) {
+    String message = String.format("Ожидаем исчезновения элемента %s", elementName);
+    reporter.info(message);
+    waitingDriver.waitForElementIsNotVisible(element, timeout, unit, msg);
   }
 
   @Override
